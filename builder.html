@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Генератор Колеса Фортуны (Конструктор кода для сайтов)</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #0f0c1b;
+      color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 28px;
+      background: linear-gradient(135deg, #ff4d6d, #fbbf24);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 800px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: #181427;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      font-size: 14px;
+      box-sizing: border-box;
+      margin-bottom: 16px;
+      outline: none;
+    }
+    input:focus, textarea:focus {
+      border-color: #fbbf24;
+    }
+    .btn {
+      padding: 12px 24px;
+      border-radius: 9999px;
+      background: linear-gradient(135deg, #ff4d6d, #fbbf24);
+      color: #fff;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    pre {
+      background: #090712;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #38bdf8;
+      font-size: 12px;
+      overflow-x: auto;
+      max-height: 480px;
+    }
+    .copy-btn {
+      float: right;
+      padding: 6px 14px;
+      border-radius: 6px;
+      background: #22c55e;
+      color: #fff;
+      border: none;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Конструктор кода: Колесо Фортуны</h1>
+    <p style="color: #94a3b8; margin-bottom: 24px;">Настройте параметры под клиента и скопируйте готовый блок в Tilda (T123) или на любой сайт.</p>
+
+    <div class="grid">
+      <!-- Настройки -->
+      <div class="card">
+        <h3>Параметры виджета</h3>
+
+        <label>Заголовок в модалке:</label>
+        <input type="text" id="cfg-title" value="Испытай удачу!">
+
+        <label>Подзаголовок:</label>
+        <input type="text" id="cfg-subtitle" value="Крути колесо и забирай гарантированный подарок">
+
+        <label>Текст плавающей кнопки:</label>
+        <input type="text" id="cfg-float-btn" value="Подарок за спин">
+
+        <label>Имя Telegram-бота (без @):</label>
+        <input type="text" id="cfg-bot" value="ssp_agency_bot">
+
+        <label>ID Яндекс.Метрики:</label>
+        <input type="text" id="cfg-metrika" value="88058414">
+
+        <label>Webhook URL (для передачи лида в CRM / скрипт):</label>
+        <input type="text" id="cfg-webhook" placeholder="https://ваш-сервер/lead">
+
+        <label>Список секторов (JSON):</label>
+        <textarea id="cfg-sectors" rows="7">[
+  {"id":1, "text":"Скидка 15%", "color":"#ff4d6d", "winText":"Скидка 15% на услуги", "weight":30, "promo":"SPIN15"},
+  {"id":2, "text":"Бонус 1 000 ₽", "color":"#1f1b2e", "winText":"Сертификат 1 000 ₽", "weight":25, "promo":"GIFT1000"},
+  {"id":3, "text":"Скидка 20%", "color":"#f72585", "winText":"Скидка 20% на услуги", "weight":15, "promo":"SUPER20"},
+  {"id":4, "text":"Разбор РК", "color":"#1f1b2e", "winText":"Бесплатный аудит рекламы", "weight":15, "promo":"AUDIT"},
+  {"id":5, "text":"Скидка 10%", "color":"#7209b7", "winText":"Скидка 10% на чек", "weight":10, "promo":"SALE10"},
+  {"id":6, "text":"VIP Бонус", "color":"#3a0ca3", "winText":"VIP Подарок 2 000 ₽", "weight":5, "promo":"VIP2000"}
+]</textarea>
+
+        <button class="btn" onclick="generateCode()">Сгенерировать код для сайта</button>
+      </div>
+
+      <!-- Готовый код -->
+      <div class="card">
+        <button class="copy-btn" onclick="copyCode()">Скопировать код</button>
+        <h3 style="margin-top:0;">Готовый код для Tilda / Сайта</h3>
+        <pre><code id="output-code">Нажмите «Сгенерировать код»</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function generateCode() {
+      const title = document.getElementById('cfg-title').value.trim();
+      const subtitle = document.getElementById('cfg-subtitle').value.trim();
+      const floatBtn = document.getElementById('cfg-float-btn').value.trim();
+      const bot = document.getElementById('cfg-bot').value.trim();
+      const metrika = document.getElementById('cfg-metrika').value.trim();
+      const webhook = document.getElementById('cfg-webhook').value.trim();
+      let sectors = [];
+      try {
+        sectors = JSON.parse(document.getElementById('cfg-sectors').value);
+      } catch(e) {
+        alert('Ошибка в формате JSON секторов');
+        return;
+      }
+
+      const configObj = {
+        title: title,
+        subtitle: subtitle,
+        floatingBtnText: floatBtn,
+        telegramBot: bot,
+        metrikaCounterId: metrika ? Number(metrika) : null,
+        metrikaGoal: 'fortune_wheel_lead',
+        webhookUrl: webhook,
+        sectors: sectors
+      };
+
+      const code = `<!-- FORTUNE WHEEL WIDGET START -->
+<script src="https://ваш-домен/wheel-widget.js" defer><\\/script>
+<script>
+  window.FORTUNE_WHEEL_CONFIG = ${JSON.stringify(configObj, null, 2)};
+<\\/script>
+<!-- FORTUNE WHEEL WIDGET END -->`;
+
+      document.getElementById('output-code').innerText = code;
+    }
+
+    function copyCode() {
+      const code = document.getElementById('output-code').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        alert('Код скопирован в буфер обмена!');
+      });
+    }
+
+    generateCode();
+  </script>
+</body>
+</html>
