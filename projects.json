@@ -1,0 +1,54 @@
+{
+  "wolfhunt": {
+    "name": "WolfHunt (Грей Зед Вульф)",
+    "title": "Бонус от WolfHunt!",
+    "subtitle": "Крути колесо и забирай разбор или скидку на запуск",
+    "floatBtn": "🐺 Крутить колесо Волка",
+    "delay": 0,
+    "bot": "greyzzzzwolf_bot",
+    "metrika": 88058414,
+    "themeColor": "#e11d48",
+    "sectors": [
+      { "id": 1, "text": "Разбор РК", "color": "#e11d48", "winText": "Бесплатный видеообзор и анализ вашей РК", "weight": 35, "promo": "WOLFAUDIT" },
+      { "id": 2, "text": "Скидка 5 000 ₽", "color": "#181224", "winText": "Скидка 5 000 ₽ на настройку Яндекс Директ", "weight": 25, "promo": "WOLF5000" },
+      { "id": 3, "text": "Скидка 15%", "color": "#f59e0b", "winText": "Скидка 15% на ведение рекламы", "weight": 15, "promo": "WOLF15" },
+      { "id": 4, "text": "Чек-лист", "color": "#181224", "winText": "Закрытый чек-лист связок", "weight": 15, "promo": "WOLFCHECK" },
+      { "id": 5, "text": "Инвайтинг TG", "color": "#7c3aed", "winText": "Тестовый инвайтинг в Telegram / MAX", "weight": 10, "promo": "WOLFINVITE" }
+    ]
+  },
+  "afrostudio": {
+    "name": "Афростудия (Бьюти салон)",
+    "title": "Секретный бонус студии!",
+    "subtitle": "Крути колесо и забирай подарок на плетение кос",
+    "floatBtn": "🎁 Бонус на плетение",
+    "delay": 7,
+    "bot": "afrostudio_bot",
+    "metrika": 88058414,
+    "themeColor": "#f43f5e",
+    "sectors": [
+      { "id": 1, "text": "Скидка 15%", "color": "#f43f5e", "winText": "Скидка 15% на первое плетение", "weight": 30, "promo": "AFRO15" },
+      { "id": 2, "text": "Подарок 1 000 ₽", "color": "#1c152a", "winText": "Сертификат 1 000 ₽ на комплект кос", "weight": 25, "promo": "AFRO1000" },
+      { "id": 3, "text": "Скидка 20%", "color": "#fb7185", "winText": "Скидка 20% на услуги салона", "weight": 15, "promo": "AFRO20" },
+      { "id": 4, "text": "Уход в подарок", "color": "#1c152a", "winText": "Премиум уход для волос в подарок", "weight": 15, "promo": "AFROCARE" },
+      { "id": 5, "text": "Скидка 10%", "color": "#9333ea", "winText": "Скидка 10% на любую услугу", "weight": 10, "promo": "AFRO10" },
+      { "id": 6, "text": "VIP 2 000 ₽", "color": "#4c1d95", "winText": "VIP Сертификат 2 000 ₽", "weight": 5, "promo": "AFROVIP" }
+    ]
+  },
+  "ssp_agency": {
+    "name": "SSP Agency (Обучение рекламе)",
+    "title": "Грант на обучение рекламе",
+    "subtitle": "Выбей максимальную скидку на практикум по Яндекс Директ",
+    "floatBtn": "🎓 Забрать скидку на курс",
+    "delay": 10,
+    "bot": "ssp_agency_bot",
+    "metrika": 88058414,
+    "themeColor": "#2563eb",
+    "sectors": [
+      { "id": 1, "text": "Скидка 20%", "color": "#2563eb", "winText": "Скидка 20% на курс", "weight": 30, "promo": "SSP20" },
+      { "id": 2, "text": "Урок в подарок", "color": "#131d33", "winText": "Доступ к закрытому уроку", "weight": 25, "promo": "SSPFREE" },
+      { "id": 3, "text": "Скидка 30%", "color": "#0284c7", "winText": "Скидка 30% на тариф Наставничество", "weight": 15, "promo": "SSP30" },
+      { "id": 4, "text": "Разбор РК", "color": "#131d33", "winText": "Персональный разбор вашей кампании", "weight": 20, "promo": "SSPAUDIT" },
+      { "id": 5, "text": "Грант 5 000 ₽", "color": "#4f46e5", "winText": "Грант 5 000 ₽ на обучение", "weight": 10, "promo": "SSP5000" }
+    ]
+  }
+}
