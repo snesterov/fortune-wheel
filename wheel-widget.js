@@ -1,13 +1,12 @@
 /**
- * FORTUNE WHEEL WIDGET (Колесо Фортуны) v3.0 — Multi-Project Manager
- * Auto-detects project from script URL: <script src=".../wheel-widget.js?p=PROJECT_ID"></script>
+ * FORTUNE WHEEL WIDGET (Колесо Фортуны) v3.5 — Page Targeting Engine
+ * Supports targetPages whitelist (up to N specific pages or all pages)
  * GitHub: https://github.com/snesterov/fortune-wheel
  * CDN: https://snesterov.github.io/fortune-wheel/wheel-widget.js
  */
 (function(window, document) {
   'use strict';
 
-  // Вшитая база проектов (с возможностью переопределения)
   const EMBEDDED_PROJECTS = {
     wolfhunt: {
       name: 'WolfHunt (Грей Зед Вульф)',
@@ -19,8 +18,7 @@
       metrikaCounterId: 88058414,
       metrikaGoal: 'fortune_wheel_lead',
       themeColor: '#e11d48',
-      secondaryColor: '#f59e0b',
-      goldColor: '#fbbf24',
+      targetPages: [], // все страницы
       sectors: [
         { id: 1, text: 'Разбор РК', color: '#e11d48', winText: 'Бесплатный видеообзор и анализ вашей РК', weight: 35, promo: 'WOLFAUDIT' },
         { id: 2, text: 'Скидка 5 000 ₽', color: '#181224', winText: 'Скидка 5 000 ₽ на настройку Яндекс Директ', weight: 25, promo: 'WOLF5000' },
@@ -39,8 +37,7 @@
       metrikaCounterId: 88058414,
       metrikaGoal: 'gamelead_send',
       themeColor: '#f43f5e',
-      secondaryColor: '#fb7185',
-      goldColor: '#fbbf24',
+      targetPages: ['/', '/price'],
       sectors: [
         { id: 1, text: 'Скидка 15%', color: '#f43f5e', winText: 'Скидка 15% на первое плетение', weight: 30, promo: 'AFRO15' },
         { id: 2, text: 'Подарок 1 000 ₽', color: '#1c152a', winText: 'Сертификат 1 000 ₽ на комплект кос', weight: 25, promo: 'AFRO1000' },
@@ -60,8 +57,7 @@
       metrikaCounterId: 88058414,
       metrikaGoal: 'ssp_wheel_lead',
       themeColor: '#2563eb',
-      secondaryColor: '#38bdf8',
-      goldColor: '#fbbf24',
+      targetPages: [],
       sectors: [
         { id: 1, text: 'Скидка 20%', color: '#2563eb', winText: 'Скидка 20% на курс', weight: 30, promo: 'SSP20' },
         { id: 2, text: 'Урок в подарок', color: '#131d33', winText: 'Доступ к закрытому уроку', weight: 25, promo: 'SSPFREE' },
@@ -72,7 +68,6 @@
     }
   };
 
-  // Определение projectId из URL самого тега script (например: ?p=wolfhunt)
   function detectProjectFromScript() {
     const scripts = document.getElementsByTagName('script');
     for (let i = scripts.length - 1; i >= 0; i--) {
@@ -88,32 +83,59 @@
   const DEFAULT_CONFIG = {
     projectId: 'wolfhunt',
     buttonText: 'Крутить колесо',
-    allowMultipleSpins: false
+    allowMultipleSpins: false,
+    targetPages: [] // пустой массив = все страницы
   };
 
   class FortuneWheelWidget {
     constructor(userConfig = {}) {
-      // 1. Ищем ID проекта: из параметров скрипта -> или из window.FORTUNE_WHEEL_CONFIG -> или default
       const detectedId = detectProjectFromScript();
       const projId = userConfig.projectId || userConfig.project || detectedId || 'wolfhunt';
 
-      // 2. Ищем локально сохраненный проект (если редактировался в админке)
       let customSaved = null;
       try {
         const registry = JSON.parse(localStorage.getItem('fw_projects_registry') || '{}');
         if (registry[projId]) customSaved = registry[projId];
       } catch (e) {}
 
-      // 3. Берем вшитый проект или кастомный
       const basePreset = customSaved || EMBEDDED_PROJECTS[projId] || EMBEDDED_PROJECTS.wolfhunt;
 
       this.projectId = projId;
       this.config = Object.assign({}, DEFAULT_CONFIG, basePreset, userConfig, { projectId: projId });
+
+      // Проверка таргетинга страниц
+      if (!this.isPageAllowed()) {
+        console.log(`[FortuneWheel] Виджет отключен для страницы: ${window.location.pathname}`);
+        return;
+      }
+
       this.isSpinning = false;
       this.hasSpun = false;
       this.currentRotation = 0;
       this.wonSector = null;
       this.init();
+    }
+
+    // Проверка разрешена ли текущая страница
+    isPageAllowed() {
+      const pages = this.config.targetPages;
+      if (!pages || !Array.isArray(pages) || pages.length === 0) return true; // если пусто — показ везде
+      
+      const currentPath = window.location.pathname.toLowerCase();
+      const currentHref = window.location.href.toLowerCase();
+
+      return pages.some(page => {
+        if (!page) return false;
+        const p = page.trim().toLowerCase();
+        if (p === '*' || p === 'all') return true;
+        // Главная страница
+        if (p === '/' && (currentPath === '/' || currentPath === '' || currentPath === '/index.html')) return true;
+        // Совпадение пути
+        if (currentPath === p || currentPath === p + '/') return true;
+        // Вхождение в URL
+        if (currentHref.indexOf(p) !== -1 || currentPath.indexOf(p) !== -1) return true;
+        return false;
+      });
     }
 
     init() {
@@ -135,7 +157,6 @@
       this.drawWheel(0);
       this.attachEvents();
 
-      // Авто-открытие по задержке (если delay > 0)
       if (this.config.delay && Number(this.config.delay) > 0 && !this.hasSpun) {
         setTimeout(() => {
           this.openModal();
@@ -618,14 +639,12 @@
         date: new Date().toISOString()
       };
 
-      // Фиксация в Яндекс.Метрике
       if (typeof window.ym === 'function' && this.config.metrikaCounterId) {
         try {
           window.ym(this.config.metrikaCounterId, 'reachGoal', this.config.metrikaGoal, leadData);
         } catch (e) {}
       }
 
-      // Webhook
       if (this.config.webhookUrl) {
         try {
           fetch(this.config.webhookUrl, {

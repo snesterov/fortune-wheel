@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Колесо Фортуны — Мульти-проектная панель управления</title>
+  <title>Колесо Фортуны — Мульти-проектная панель + Таргетинг страниц</title>
   <style>
     :root {
       --primary: #f43f5e;
@@ -26,7 +26,7 @@
     .top-deck {
       background: linear-gradient(180deg, #18122c 0%, #100b1e 100%);
       border-bottom: 2px solid rgba(244, 63, 94, 0.35);
-      padding: 18px 24px;
+      padding: 16px 22px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.6);
       position: relative;
       z-index: 1000;
@@ -35,12 +35,12 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
     }
     .deck-title {
-      font-size: 20px;
+      font-size: 19px;
       font-weight: 800;
       background: linear-gradient(135deg, #ffffff 0%, #fbbf24 100%);
       -webkit-background-clip: text;
@@ -55,7 +55,7 @@
       flex-wrap: wrap;
     }
     .btn {
-      padding: 9px 18px;
+      padding: 8px 16px;
       border-radius: 9999px;
       font-size: 13px;
       font-weight: 700;
@@ -72,43 +72,29 @@
       box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4);
     }
     .btn-apply:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(244, 63, 94, 0.6); }
-    .btn-save {
-      background: #10b981;
-      color: #fff;
-    }
+    .btn-save { background: #10b981; color: #fff; }
     .btn-save:hover { background: #059669; }
-    .btn-new {
-      background: #6366f1;
-      color: #fff;
-    }
+    .btn-new { background: #6366f1; color: #fff; }
     .btn-new:hover { background: #4f46e5; }
-    .btn-copy {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #fbcfe8;
-    }
+    .btn-copy { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); color: #fbcfe8; }
     .btn-copy:hover { background: rgba(255, 255, 255, 0.15); color: #fff; }
-    .btn-del {
-      background: rgba(239, 68, 68, 0.15);
-      border: 1px solid #ef4444;
-      color: #f87171;
-    }
+    .btn-del { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #f87171; }
     .btn-del:hover { background: #ef4444; color: #fff; }
 
     /* Project Switcher Bar */
     .project-bar {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 10px 14px;
+      gap: 10px;
+      padding: 8px 12px;
       background: rgba(0, 0, 0, 0.35);
-      border-radius: 12px;
+      border-radius: 10px;
       border: 1px solid var(--border);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       flex-wrap: wrap;
     }
     .project-bar label {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
       color: #fbbf24;
       text-transform: uppercase;
@@ -116,38 +102,38 @@
     }
     .project-select {
       flex: 1;
-      min-width: 220px;
-      padding: 8px 12px;
+      min-width: 200px;
+      padding: 7px 10px;
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid var(--border);
       color: #fff;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       outline: none;
     }
     .project-id-input {
-      width: 160px;
-      padding: 8px 10px;
+      width: 140px;
+      padding: 7px 10px;
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border);
       color: #cbd5e1;
-      font-size: 13px;
+      font-size: 12px;
       outline: none;
     }
 
     /* Controls Grid */
     .controls-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 14px;
-      margin-bottom: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 12px;
+      margin-bottom: 12px;
     }
     .control-group {
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 4px;
     }
     .control-group label {
       font-size: 11px;
@@ -157,12 +143,12 @@
       letter-spacing: 0.05em;
     }
     .control-group input, .control-group select {
-      padding: 8px 10px;
+      padding: 7px 10px;
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid var(--border);
       color: #fff;
-      font-size: 13px;
+      font-size: 12px;
       outline: none;
       transition: border-color 0.2s;
     }
@@ -170,12 +156,78 @@
       border-color: var(--gold);
     }
 
+    /* Target Pages Deck */
+    .pages-deck {
+      background: rgba(0, 0, 0, 0.28);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      margin-bottom: 12px;
+    }
+    .pages-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .pages-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #fbbf24;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .pages-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .page-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      padding: 4px 8px;
+    }
+    .page-chip input {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 12px;
+      width: 110px;
+      outline: none;
+    }
+    .page-chip-del {
+      background: transparent;
+      border: none;
+      color: #f87171;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+    }
+    .btn-add-page {
+      background: rgba(251, 191, 36, 0.15);
+      border: 1px dashed #fbbf24;
+      color: #fbbf24;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .btn-add-page:hover { background: rgba(251, 191, 36, 0.3); }
+
     /* Sectors Table Editor */
     .sectors-panel {
       background: rgba(0, 0, 0, 0.25);
-      border-radius: 12px;
+      border-radius: 10px;
       border: 1px solid var(--border);
-      padding: 12px 14px;
+      padding: 10px 12px;
     }
     .sectors-header {
       display: flex;
@@ -189,9 +241,9 @@
     }
     .sectors-list {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       gap: 8px;
-      max-height: 150px;
+      max-height: 140px;
       overflow-y: auto;
       padding-right: 4px;
     }
@@ -200,31 +252,31 @@
       align-items: center;
       gap: 6px;
       background: rgba(255, 255, 255, 0.04);
-      padding: 5px 8px;
+      padding: 4px 8px;
       border-radius: 8px;
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
     .sector-item input[type="text"] {
       flex: 1;
-      padding: 5px 6px;
-      font-size: 12px;
+      padding: 4px 6px;
+      font-size: 11px;
       background: transparent;
       border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 6px;
       color: #fff;
     }
     .sector-item input[type="color"] {
-      width: 26px;
-      height: 26px;
+      width: 24px;
+      height: 24px;
       border: none;
       border-radius: 6px;
       cursor: pointer;
       background: transparent;
     }
     .sector-item .sec-prob {
-      width: 48px;
-      padding: 5px;
-      font-size: 12px;
+      width: 44px;
+      padding: 4px;
+      font-size: 11px;
       background: transparent;
       border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 6px;
@@ -240,9 +292,9 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding: 30px 20px;
+      padding: 24px 20px;
       background: radial-gradient(circle at center, #1b1330 0%, #0a0714 100%);
-      min-height: 480px;
+      min-height: 440px;
     }
     .sandbox-watermark {
       position: absolute;
@@ -257,24 +309,24 @@
     .sandbox-hero {
       text-align: center;
       max-width: 650px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
     .sandbox-hero h2 {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 800;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       background: linear-gradient(135deg, #ffffff 0%, #fbcfe8 50%, #fbbf24 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
     .sandbox-hero p {
-      font-size: 14px;
+      font-size: 13px;
       color: #94a3b8;
       line-height: 1.5;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
     .trigger-test-btn {
-      padding: 14px 34px;
+      padding: 13px 32px;
       border-radius: 9999px;
       background: linear-gradient(135deg, #f43f5e 0%, #fbbf24 100%);
       color: #fff;
@@ -287,26 +339,44 @@
     }
     .trigger-test-btn:hover { transform: translateY(-2px) scale(1.03); }
     .delay-status-badge {
-      margin-top: 14px;
+      margin-top: 12px;
       font-size: 12px;
       color: #fbbf24;
       display: inline-flex;
       align-items: center;
       gap: 6px;
     }
+    .page-tester-box {
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0,0,0,0.4);
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .page-tester-box input {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 12px;
+      outline: none;
+      width: 140px;
+    }
   </style>
 </head>
 <body>
 
-  <!-- ================= TOP PANE: MULTI-PROJECT CONTROLS ================= -->
+  <!-- ================= TOP PANE: MULTI-PROJECT & TARGETING ================= -->
   <div class="top-deck">
     <div class="deck-header">
       <div class="deck-title">
-        📁 МЕНЕДЖЕР ПРОЕКТОВ КОЛЕСА ФОРТУНЫ
+        📁 УПРАВЛЕНИЕ КОЛЕСОМ ФОРТУНЫ
         <span id="active-project-tag" style="font-size:12px; color:#4ade80; background:rgba(34,197,94,0.15); padding:3px 10px; border-radius:9999px;">Проект: WolfHunt</span>
       </div>
       <div class="deck-actions">
-        <button class="btn btn-save" onclick="saveCurrentProject()">💾 Сохранить проект</button>
+        <button class="btn btn-save" onclick="saveCurrentProject()">💾 Сохранить</button>
         <button class="btn btn-new" onclick="createNewProject()">➕ Новый проект</button>
         <button class="btn btn-apply" onclick="applySettings()">⚡ Тест внизу</button>
         <button class="btn btn-copy" onclick="copyEmbedCode()">📋 Код для Tilda</button>
@@ -316,18 +386,30 @@
 
     <!-- Project Switcher -->
     <div class="project-bar">
-      <label>Выбрать проект:</label>
-      <select id="project-selector" class="project-select" onchange="switchProject(this.value)">
-        <!-- populated from registry -->
-      </select>
+      <label>Проект:</label>
+      <select id="project-selector" class="project-select" onchange="switchProject(this.value)"></select>
       <span style="font-size:12px; color:#94a3b8;">ID в коде:</span>
       <input type="text" id="project-slug" class="project-id-input" placeholder="id-proekta">
+    </div>
+
+    <!-- Target Pages Whitelist Deck -->
+    <div class="pages-deck">
+      <div class="pages-header">
+        <div class="pages-title">🎯 На каких страницах показывать виджет (URL Whitelist):</div>
+        <button class="btn-add-page" onclick="addPagePath()">+ Добавить страницу (до 5)</button>
+      </div>
+      <div class="pages-chips" id="pages-chips-container">
+        <!-- populated dynamically -->
+      </div>
+      <div style="font-size:11px; color:#94a3b8; margin-top:6px;">
+        * Если список пустой — виджет показывается на ВСЕМ сайте. Укажите конкретные страницы (например: <code>/</code>, <code>/price</code>, <code>/promo</code>), чтобы виджет выходил только на них.
+      </div>
     </div>
 
     <!-- Quick Inputs Grid -->
     <div class="controls-grid">
       <div class="control-group">
-        <label>Название проекта (для вас):</label>
+        <label>Название проекта:</label>
         <input type="text" id="cfg-name" value="WolfHunt">
       </div>
 
@@ -368,9 +450,7 @@
         <span>Сектора, призы и шансы выпадения (% вес)</span>
         <button onclick="addSector()" style="background:rgba(255,255,255,0.1); border:none; color:#fbbf24; font-size:11px; padding:3px 8px; border-radius:4px; cursor:pointer;">+ Добавить сектор</button>
       </div>
-      <div class="sectors-list" id="sectors-editor">
-        <!-- populated dynamically -->
-      </div>
+      <div class="sectors-list" id="sectors-editor"></div>
     </div>
   </div>
 
@@ -381,12 +461,20 @@
     <div class="sandbox-hero">
       <h2 id="preview-h2">WolfHunt / Grey Wolf</h2>
       <p id="preview-p">
-        Виджет полностью изолирован под выбранный проект: свои призы, промокоды, бот и статистика спинов.
+        Виджет изолирован под выбранный проект и проверяет разрешенные страницы перед открытием.
       </p>
       <button class="trigger-test-btn" onclick="openCurrentWheel()">
         🎁 Испытать Колесо
       </button>
       <div class="delay-status-badge" id="delay-timer-label"></div>
+
+      <!-- Live Page URL Simulator -->
+      <div class="page-tester-box">
+        <span style="font-size:11px; color:#cbd5e1;">Тест URL страницы:</span>
+        <input type="text" id="simulated-path" value="/" placeholder="/price">
+        <button onclick="testPageSimulation()" style="background:#f43f5e; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-size:11px; cursor:pointer;">Проверить</button>
+        <span id="page-match-result" style="font-size:11px; font-weight:700;"></span>
+      </div>
     </div>
   </div>
 
@@ -394,7 +482,6 @@
   <script src="wheel-widget.js"></script>
 
   <script>
-    // Начальная база проектов
     const INITIAL_PROJECTS = {
       wolfhunt: {
         name: 'WolfHunt (Грей Зед Вульф)',
@@ -404,6 +491,7 @@
         delay: 0,
         bot: 'greyzzzzwolf_bot',
         metrika: 88058414,
+        targetPages: [], // везде
         sectors: [
           { id: 1, text: 'Разбор РК', color: '#e11d48', winText: 'Бесплатный видеообзор и анализ вашей РК', weight: 35, promo: 'WOLFAUDIT' },
           { id: 2, text: 'Скидка 5 000 ₽', color: '#181224', winText: 'Скидка 5 000 ₽ на настройку Яндекс Директ', weight: 25, promo: 'WOLF5000' },
@@ -420,6 +508,7 @@
         delay: 7,
         bot: 'afrostudio_bot',
         metrika: 88058414,
+        targetPages: ['/', '/price'],
         sectors: [
           { id: 1, text: 'Скидка 15%', color: '#f43f5e', winText: 'Скидка 15% на первое плетение', weight: 30, promo: 'AFRO15' },
           { id: 2, text: 'Подарок 1 000 ₽', color: '#1c152a', winText: 'Сертификат 1 000 ₽ на комплект кос', weight: 25, promo: 'AFRO1000' },
@@ -437,6 +526,7 @@
         delay: 10,
         bot: 'ssp_agency_bot',
         metrika: 88058414,
+        targetPages: ['/kurs', '/obuchenie'],
         sectors: [
           { id: 1, text: 'Скидка 20%', color: '#2563eb', winText: 'Скидка 20% на курс', weight: 30, promo: 'SSP20' },
           { id: 2, text: 'Урок в подарок', color: '#131d33', winText: 'Доступ к закрытому уроку', weight: 25, promo: 'SSPFREE' },
@@ -447,7 +537,6 @@
       }
     };
 
-    // Загрузка реестра проектов из LocalStorage
     let projectsRegistry = {};
     try {
       const saved = localStorage.getItem('fw_projects_registry');
@@ -463,6 +552,7 @@
 
     let currentProjectId = 'wolfhunt';
     let currentSectors = [];
+    let currentTargetPages = [];
 
     function populateProjectSelector() {
       const sel = document.getElementById('project-selector');
@@ -495,8 +585,67 @@
       document.getElementById('preview-h2').innerText = p.name || pid;
 
       currentSectors = JSON.parse(JSON.stringify(p.sectors || []));
+      currentTargetPages = Array.isArray(p.targetPages) ? JSON.parse(JSON.stringify(p.targetPages)) : [];
+
+      renderPagesChips();
       renderSectorsEditor();
       applySettings();
+    }
+
+    /* Target Pages Functions */
+    function renderPagesChips() {
+      const container = document.getElementById('pages-chips-container');
+      container.innerHTML = '';
+      if (currentTargetPages.length === 0) {
+        const emptyBadge = document.createElement('span');
+        emptyBadge.style.cssText = 'color:#4ade80; font-size:12px; font-weight:700;';
+        emptyBadge.innerText = '🌐 Показывается на ВСЕХ страницах сайта';
+        container.appendChild(emptyBadge);
+        return;
+      }
+      currentTargetPages.forEach((p, idx) => {
+        const chip = document.createElement('div');
+        chip.className = 'page-chip';
+        chip.innerHTML = `
+          <input type="text" value="${p}" placeholder="/page" onchange="currentTargetPages[${idx}]=this.value.trim()">
+          <button class="page-chip-del" onclick="removePagePath(${idx})">&times;</button>
+        `;
+        container.appendChild(chip);
+      });
+    }
+
+    function addPagePath() {
+      if (currentTargetPages.length >= 5) {
+        alert('Максимум 5 целевых страниц в списке!');
+        return;
+      }
+      currentTargetPages.push(currentTargetPages.length === 0 ? '/' : '/page' + (currentTargetPages.length + 1));
+      renderPagesChips();
+    }
+
+    function removePagePath(idx) {
+      currentTargetPages.splice(idx, 1);
+      renderPagesChips();
+    }
+
+    function testPageSimulation() {
+      const testPath = document.getElementById('simulated-path').value.trim().toLowerCase();
+      const resEl = document.getElementById('page-match-result');
+      if (currentTargetPages.length === 0) {
+        resEl.innerHTML = '<span style="color:#4ade80;">✅ Разрешено (показ на всех страницах)</span>';
+        return;
+      }
+      const allowed = currentTargetPages.some(page => {
+        const p = page.trim().toLowerCase();
+        if (p === '*' || p === testPath || (p === '/' && (testPath === '/' || testPath === ''))) return true;
+        if (testPath.indexOf(p) !== -1) return true;
+        return false;
+      });
+      if (allowed) {
+        resEl.innerHTML = '<span style="color:#4ade80;">✅ Показывается на этой странице</span>';
+      } else {
+        resEl.innerHTML = '<span style="color:#f87171;">⛔ Заблокировано (не входит в список)</span>';
+      }
     }
 
     function renderSectorsEditor() {
@@ -508,7 +657,7 @@
         item.innerHTML = `
           <input type="color" value="${s.color}" onchange="currentSectors[${idx}].color=this.value">
           <input type="text" value="${s.text}" placeholder="Текст" onchange="currentSectors[${idx}].text=this.value; currentSectors[${idx}].winText=this.value;">
-          <input type="text" value="${s.promo}" style="width:65px;" placeholder="ПРОМО" onchange="currentSectors[${idx}].promo=this.value;">
+          <input type="text" value="${s.promo}" style="width:60px;" placeholder="ПРОМО" onchange="currentSectors[${idx}].promo=this.value;">
           <input type="number" class="sec-prob" value="${s.weight}" title="Вес шанса" onchange="currentSectors[${idx}].weight=Number(this.value)">
           <button onclick="removeSector(${idx})" style="background:transparent; border:none; color:#f87171; cursor:pointer;">&times;</button>
         `;
@@ -540,7 +689,7 @@
     function saveCurrentProject() {
       const slug = document.getElementById('project-slug').value.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
       if (!slug) {
-        alert('Укажите ID проекта латиницей (например: avtosalon, barbershop)');
+        alert('Укажите ID проекта латиницей');
         return;
       }
 
@@ -552,10 +701,10 @@
         delay: Number(document.getElementById('cfg-delay').value) || 0,
         bot: document.getElementById('cfg-bot').value.trim(),
         metrika: Number(document.getElementById('cfg-metrika').value) || null,
+        targetPages: currentTargetPages,
         sectors: currentSectors
       };
 
-      // Если сменили slug
       if (slug !== currentProjectId && projectsRegistry[currentProjectId]) {
         delete projectsRegistry[currentProjectId];
       }
@@ -566,7 +715,7 @@
 
       populateProjectSelector();
       switchProject(slug);
-      alert(`Проект «${pData.name}» успешно сохранен!`);
+      alert(`Проект «${pData.name}» с таргетингом страниц сохранен!`);
     }
 
     function createNewProject() {
@@ -582,6 +731,7 @@
         delay: 5,
         bot: 'your_bot',
         metrika: null,
+        targetPages: [],
         sectors: [
           { id: 1, text: 'Скидка 10%', color: '#f43f5e', winText: 'Скидка 10%', weight: 40, promo: 'SALE10' },
           { id: 2, text: 'Бонус 1 000 ₽', color: '#1e1b2e', winText: 'Бонус 1 000 ₽', weight: 30, promo: 'GIFT1000' },
@@ -628,6 +778,7 @@
         floatingBtnText: document.getElementById('cfg-float-btn').value,
         telegramBot: document.getElementById('cfg-bot').value,
         metrikaCounterId: document.getElementById('cfg-metrika').value ? Number(document.getElementById('cfg-metrika').value) : null,
+        targetPages: currentTargetPages,
         sectors: currentSectors,
         allowMultipleSpins: true
       };
@@ -645,6 +796,7 @@
       } else {
         timerLabel.innerText = 'Виджет готов к ручному клику';
       }
+      testPageSimulation();
     }
 
     function openCurrentWheel() {
@@ -668,6 +820,7 @@
     telegramBot: "${document.getElementById('cfg-bot').value}",
     metrikaCounterId: ${document.getElementById('cfg-metrika').value || 'null'},
     delay: ${delaySec},
+    targetPages: ${JSON.stringify(currentTargetPages)}, // Пустой = все страницы, иначе только указанные
     sectors: ${JSON.stringify(currentSectors, null, 4)}
   };
 <\\/script>`;
