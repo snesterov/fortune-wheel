@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Колесо Фортуны — Панель управления и Живой виджет</title>
+  <style>
+    :root {
+      --primary: #f43f5e;
+      --gold: #fbbf24;
+      --bg-dark: #0a0714;
+      --card-bg: #140f24;
+      --border: rgba(255, 255, 255, 0.12);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-dark);
+      color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* TOP PANE: CONTROL DECK */
+    .top-deck {
+      background: linear-gradient(180deg, #18122c 0%, #100b1e 100%);
+      border-bottom: 2px solid rgba(244, 63, 94, 0.35);
+      padding: 20px 28px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      position: relative;
+      z-index: 1000;
+    }
+    .deck-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .deck-title {
+      font-size: 20px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 0%, #fbbf24 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .deck-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .btn {
+      padding: 10px 20px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .btn-apply {
+      background: linear-gradient(135deg, #f43f5e, #fbbf24);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4);
+    }
+    .btn-apply:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(244, 63, 94, 0.6); }
+    .btn-copy {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fbcfe8;
+    }
+    .btn-copy:hover { background: rgba(255, 255, 255, 0.15); color: #fff; }
+
+    /* Controls Grid */
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .control-group label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #cbd5e1;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .control-group input, .control-group select {
+      padding: 9px 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      color: #fff;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .control-group input:focus, .control-group select:focus {
+      border-color: var(--gold);
+    }
+
+    /* Sectors Table Editor */
+    .sectors-panel {
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 12px 16px;
+      margin-top: 10px;
+    }
+    .sectors-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fbcfe8;
+      text-transform: uppercase;
+    }
+    .sectors-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 10px;
+      max-height: 160px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+    .sector-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .sector-item input[type="text"] {
+      flex: 1;
+      padding: 6px 8px;
+      font-size: 12px;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      color: #fff;
+    }
+    .sector-item input[type="color"] {
+      width: 28px;
+      height: 28px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: transparent;
+    }
+    .sector-item .sec-prob {
+      width: 52px;
+      padding: 6px;
+      font-size: 12px;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      color: #fbbf24;
+      text-align: center;
+    }
+
+    /* BOTTOM PANE: LIVE SANDBOX */
+    .bottom-sandbox {
+      flex: 1;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+      background: radial-gradient(circle at center, #1b1330 0%, #0a0714 100%);
+      min-height: 520px;
+    }
+    .sandbox-watermark {
+      position: absolute;
+      top: 16px;
+      left: 20px;
+      font-size: 12px;
+      color: #64748b;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .sandbox-hero {
+      text-align: center;
+      max-width: 650px;
+      margin-bottom: 24px;
+    }
+    .sandbox-hero h2 {
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #ffffff 0%, #fbcfe8 50%, #fbbf24 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .sandbox-hero p {
+      font-size: 15px;
+      color: #94a3b8;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .trigger-test-btn {
+      padding: 15px 36px;
+      border-radius: 9999px;
+      background: linear-gradient(135deg, #f43f5e 0%, #fbbf24 100%);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(244, 63, 94, 0.5);
+      transition: transform 0.2s;
+    }
+    .trigger-test-btn:hover {
+      transform: translateY(-2px) scale(1.03);
+    }
+    .delay-status-badge {
+      margin-top: 18px;
+      font-size: 13px;
+      color: #fbbf24;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= TOP PANE: CONTROLS & DELAYS ================= -->
+  <div class="top-deck">
+    <div class="deck-header">
+      <div class="deck-title">
+        ⚙️ КОНСТРУКТОР КОЛЕСА ФОРТУНЫ
+        <span style="font-size:12px; color:#4ade80; background:rgba(34,197,94,0.15); padding:3px 10px; border-radius:9999px;">Живой режим</span>
+      </div>
+      <div class="deck-actions">
+        <button class="btn btn-apply" onclick="applySettings()">⚡ Применить к колесу</button>
+        <button class="btn btn-copy" onclick="copyEmbedCode()">📋 Копировать код для Tilda</button>
+      </div>
+    </div>
+
+    <!-- Quick Inputs Grid -->
+    <div class="controls-grid">
+      <div class="control-group">
+        <label>Проект / Шаблон:</label>
+        <select id="cfg-preset" onchange="loadPreset(this.value)">
+          <option value="wolfhunt" selected>WolfHunt / Grey Wolf (Маркетинг)</option>
+          <option value="afrostudio">Афростудия (Бьюти / Салон)</option>
+          <option value="ssp_agency">SSP Agency (Обучение рекламе)</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label>Заголовок в колесе:</label>
+        <input type="text" id="cfg-title" value="Испытай удачу!">
+      </div>
+
+      <div class="control-group">
+        <label>Подзаголовок:</label>
+        <input type="text" id="cfg-subtitle" value="Крути колесо и забирай гарантированный бонус">
+      </div>
+
+      <div class="control-group">
+        <label>Текст плавающей кнопки:</label>
+        <input type="text" id="cfg-float-btn" value="🐺 Крутить колесо">
+      </div>
+
+      <div class="control-group">
+        <label>Задержка авто-показа (сек):</label>
+        <input type="number" id="cfg-delay" value="0" min="0" max="60" placeholder="0 = только по клику">
+      </div>
+
+      <div class="control-group">
+        <label>Telegram-бот (без @):</label>
+        <input type="text" id="cfg-bot" value="greyzzzzwolf_bot">
+      </div>
+
+      <div class="control-group">
+        <label>ID Яндекс.Метрики:</label>
+        <input type="text" id="cfg-metrika" value="88058414">
+      </div>
+    </div>
+
+    <!-- Sectors Live Table -->
+    <div class="sectors-panel">
+      <div class="sectors-header">
+        <span>Сектора, призы и шансы выпадения (% вес)</span>
+        <span style="font-size:11px; color:#94a3b8;">Цвет / Название / Промокод / Шанс</span>
+      </div>
+      <div class="sectors-list" id="sectors-editor">
+        <!-- populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= BOTTOM PANE: LIVE SANDBOX ================= -->
+  <div class="bottom-sandbox">
+    <div class="sandbox-watermark">Превью страницы клиента (WolfHunt / Tilda)</div>
+    
+    <div class="sandbox-hero">
+      <h2>Тестовая посадочная страница</h2>
+      <p>
+        В нижней части работает полнофункциональный виджет: плавающая кнопка в правом углу, физика затухания, аудио-щелчки секторов, форма захвата номера телефона РФ и переход в бота с промокодом.
+      </p>
+      <button class="trigger-test-btn" onclick="openCurrentWheel()">
+        🎁 Открыть Колесо Фортуны
+      </button>
+      <div class="delay-status-badge" id="delay-timer-label"></div>
+    </div>
+  </div>
+
+  <!-- WIDGET SCRIPT -->
+  <script src="wheel-widget.js"></script>
+
+  <script>
+    // Текущие сектора
+    let currentSectors = [
+      { id: 1, text: 'Разбор РК', color: '#e11d48', winText: 'Бесплатный видеообзор и анализ вашей РК', weight: 35, promo: 'WOLFAUDIT' },
+      { id: 2, text: 'Скидка 5 000 ₽', color: '#181224', winText: 'Скидка 5 000 ₽ на настройку Яндекс Директ', weight: 25, promo: 'WOLF5000' },
+      { id: 3, text: 'Скидка 15%', color: '#f59e0b', winText: 'Скидка 15% на ведение рекламы', weight: 15, promo: 'WOLF15' },
+      { id: 4, text: 'Чек-лист', color: '#181224', winText: 'Закрытый чек-лист масштабирования связок', weight: 15, promo: 'WOLFCHECK' },
+      { id: 5, text: 'Инвайтинг TG', color: '#7c3aed', winText: 'Тестовый инвайтинг в Telegram / MAX', weight: 10, promo: 'WOLFINVITE' }
+    ];
+
+    const PRESETS = {
+      wolfhunt: {
+        title: 'Бонус от WolfHunt!',
+        subtitle: 'Крути колесо и забирай разбор или скидку на запуск',
+        floatBtn: '🐺 Крутить колесо Волка',
+        bot: 'greyzzzzwolf_bot',
+        sectors: [
+          { id: 1, text: 'Разбор РК', color: '#e11d48', winText: 'Бесплатный видеообзор и анализ вашей РК', weight: 35, promo: 'WOLFAUDIT' },
+          { id: 2, text: 'Скидка 5 000 ₽', color: '#181224', winText: 'Скидка 5 000 ₽ на настройку Яндекс Директ', weight: 25, promo: 'WOLF5000' },
+          { id: 3, text: 'Скидка 15%', color: '#f59e0b', winText: 'Скидка 15% на ведение рекламы', weight: 15, promo: 'WOLF15' },
+          { id: 4, text: 'Чек-лист', color: '#181224', winText: 'Закрытый чек-лист связок', weight: 15, promo: 'WOLFCHECK' },
+          { id: 5, text: 'Инвайтинг TG', color: '#7c3aed', winText: 'Тестовый инвайтинг в Telegram', weight: 10, promo: 'WOLFINVITE' }
+        ]
+      },
+      afrostudio: {
+        title: 'Секретный бонус студии!',
+        subtitle: 'Крути колесо и забирай подарок на плетение кос',
+        floatBtn: '🎁 Бонус на плетение',
+        bot: 'afrostudio_bot',
+        sectors: [
+          { id: 1, text: 'Скидка 15%', color: '#f43f5e', winText: 'Скидка 15% на первое плетение', weight: 30, promo: 'AFRO15' },
+          { id: 2, text: 'Подарок 1 000 ₽', color: '#1c152a', winText: 'Сертификат 1 000 ₽ на комплект кос', weight: 25, promo: 'AFRO1000' },
+          { id: 3, text: 'Скидка 20%', color: '#fb7185', winText: 'Скидка 20% на услуги салона', weight: 15, promo: 'AFRO20' },
+          { id: 4, text: 'Уход в подарок', color: '#1c152a', winText: 'Премиум уход для волос в подарок', weight: 15, promo: 'AFROCARE' },
+          { id: 5, text: 'Скидка 10%', color: '#9333ea', winText: 'Скидка 10% на любую услугу', weight: 10, promo: 'AFRO10' },
+          { id: 6, text: 'VIP 2 000 ₽', color: '#4c1d95', winText: 'VIP Сертификат 2 000 ₽', weight: 5, promo: 'AFROVIP' }
+        ]
+      },
+      ssp_agency: {
+        title: 'Грант на обучение рекламе',
+        subtitle: 'Выбей максимальную скидку на практикум по Яндекс Директ',
+        floatBtn: '🎓 Забрать скидку на курс',
+        bot: 'ssp_agency_bot',
+        sectors: [
+          { id: 1, text: 'Скидка 20%', color: '#2563eb', winText: 'Скидка 20% на курс', weight: 30, promo: 'SSP20' },
+          { id: 2, text: 'Урок в подарок', color: '#131d33', winText: 'Доступ к закрытому уроку', weight: 25, promo: 'SSPFREE' },
+          { id: 3, text: 'Скидка 30%', color: '#0284c7', winText: 'Скидка 30% на тариф Наставничество', weight: 15, promo: 'SSP30' },
+          { id: 4, text: 'Разбор РК', color: '#131d33', winText: 'Персональный разбор вашей кампании', weight: 20, promo: 'SSPAUDIT' },
+          { id: 5, text: 'Грант 5 000 ₽', color: '#4f46e5', winText: 'Грант 5 000 ₽ на обучение', weight: 10, promo: 'SSP5000' }
+        ]
+      }
+    };
+
+    function renderSectorsEditor() {
+      const list = document.getElementById('sectors-editor');
+      list.innerHTML = '';
+      currentSectors.forEach((s, idx) => {
+        const item = document.createElement('div');
+        item.className = 'sector-item';
+        item.innerHTML = `
+          <input type="color" value="${s.color}" onchange="currentSectors[${idx}].color=this.value">
+          <input type="text" value="${s.text}" placeholder="Приз" onchange="currentSectors[${idx}].text=this.value; currentSectors[${idx}].winText=this.value;">
+          <input type="text" value="${s.promo}" style="width:65px;" placeholder="ПРОМО" onchange="currentSectors[${idx}].promo=this.value;">
+          <input type="number" class="sec-prob" value="${s.weight}" title="Вес шанса" onchange="currentSectors[${idx}].weight=Number(this.value)">
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function loadPreset(key) {
+      const p = PRESETS[key];
+      if (!p) return;
+      document.getElementById('cfg-title').value = p.title;
+      document.getElementById('cfg-subtitle').value = p.subtitle;
+      document.getElementById('cfg-float-btn').value = p.floatBtn;
+      document.getElementById('cfg-bot').value = p.bot;
+      currentSectors = JSON.parse(JSON.stringify(p.sectors));
+      renderSectorsEditor();
+      applySettings();
+    }
+
+    let delayTimer = null;
+
+    function applySettings() {
+      // Очистка старых элементов виджета если были
+      const oldBtn = document.getElementById('fw-trigger-btn');
+      if (oldBtn) oldBtn.remove();
+      const oldModal = document.getElementById('fw-modal');
+      if (oldModal) oldModal.remove();
+      const oldStyle = document.getElementById('fw-styles');
+      if (oldStyle) oldStyle.remove();
+
+      const delaySec = Number(document.getElementById('cfg-delay').value) || 0;
+
+      const newConfig = {
+        title: document.getElementById('cfg-title').value,
+        subtitle: document.getElementById('cfg-subtitle').value,
+        floatingBtnText: document.getElementById('cfg-float-btn').value,
+        telegramBot: document.getElementById('cfg-bot').value,
+        metrikaCounterId: document.getElementById('cfg-metrika').value ? Number(document.getElementById('cfg-metrika').value) : null,
+        sectors: currentSectors,
+        allowMultipleSpins: true // для быстрого тестирования
+      };
+
+      window.fwInstance = new window.FortuneWheelWidget(newConfig);
+
+      // Обработка задержки
+      clearTimeout(delayTimer);
+      const timerLabel = document.getElementById('delay-timer-label');
+      if (delaySec > 0) {
+        timerLabel.innerText = `⏳ Авто-открытие через ${delaySec} сек...`;
+        delayTimer = setTimeout(() => {
+          if (window.fwInstance) window.fwInstance.openModal();
+          timerLabel.innerText = '✅ Виджет сработал по таймеру';
+        }, delaySec * 1000);
+      } else {
+        timerLabel.innerText = 'Виджет готов к ручному клику';
+      }
+    }
+
+    function openCurrentWheel() {
+      if (window.fwInstance) {
+        window.fwInstance.openModal();
+      }
+    }
+
+    function copyEmbedCode() {
+      const delaySec = Number(document.getElementById('cfg-delay').value) || 0;
+      const cfg = {
+        title: document.getElementById('cfg-title').value,
+        subtitle: document.getElementById('cfg-subtitle').value,
+        floatingBtnText: document.getElementById('cfg-float-btn').value,
+        telegramBot: document.getElementById('cfg-bot').value,
+        metrikaCounterId: document.getElementById('cfg-metrika').value ? Number(document.getElementById('cfg-metrika').value) : null,
+        sectors: currentSectors
+      };
+
+      let code = `<!-- FORTUNE WHEEL WIDGET FOR TILDA -->
+<script src="https://snesterov.github.io/fortune-wheel/wheel-widget.js" defer><\\/script>
+<script>
+  window.FORTUNE_WHEEL_CONFIG = ${JSON.stringify(cfg, null, 2)};
+`;
+      if (delaySec > 0) {
+        code += `
+  // Задержка авто-показа
+  setTimeout(function() {
+    if (window.fwInstance) window.fwInstance.openModal();
+  }, ${delaySec * 1000});
+`;
+      }
+      code += `<\\/script>`;
+
+      navigator.clipboard.writeText(code).then(() => {
+        alert('Готовый код со всеми полями и задержкой скопирован в буфер обмена!');
+      });
+    }
+
+    // Инициализация при старте
+    document.addEventListener('DOMContentLoaded', () => {
+      renderSectorsEditor();
+      applySettings();
+    });
+  </script>
+</body>
+</html>
