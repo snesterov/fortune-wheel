@@ -1,40 +1,93 @@
 /**
- * FORTUNE WHEEL WIDGET (Колесо Фортуны)
+ * FORTUNE WHEEL WIDGET (Колесо Фортуны) v2.0
+ * Multi-Project Engine: Afrostudio, Grey Wolf, SSP Agency & Custom
  * Standalone embeddable interactive lead-generation widget for websites & Tilda
- * Compatible with Yandex Metrika, Telegram bot & MAX
+ * GitHub: https://github.com/snesterov/fortune-wheel
+ * CDN: https://snesterov.github.io/fortune-wheel/wheel-widget.js
  */
 (function(window, document) {
   'use strict';
 
-  // Default configuration
+  // ПРЕСЕТЫ ПРОЕКТОВ
+  const PROJECT_PRESETS = {
+    // 1. Афростудия (Бьюти)
+    afrostudio: {
+      title: 'Секретный бонус студии!',
+      subtitle: 'Крути колесо и забирай подарок на плетение афрокос или наращивание',
+      floatingBtnText: '🎁 Твой бонус на визит',
+      themeColor: '#f43f5e',
+      secondaryColor: '#fb7185',
+      goldColor: '#fbbf24',
+      bgColor: '#120d1c',
+      telegramBot: 'afrostudio_bot',
+      metrikaCounterId: 88058414,
+      metrikaGoal: 'gamelead_send',
+      sectors: [
+        { id: 1, text: 'Скидка 15%', color: '#f43f5e', winText: 'Скидка 15% на первое плетение', weight: 30, promo: 'AFRO15' },
+        { id: 2, text: 'Подарок 1 000 ₽', color: '#1c152a', winText: 'Сертификат 1 000 ₽ на комплект кос', weight: 25, promo: 'AFRO1000' },
+        { id: 3, text: 'Скидка 20%', color: '#fb7185', winText: 'Скидка 20% на услуги салона', weight: 15, promo: 'AFRO20' },
+        { id: 4, text: 'Уход в подарок', color: '#1c152a', winText: 'Премиум уход для волос в подарок', weight: 15, promo: 'AFROCARE' },
+        { id: 5, text: 'Скидка 10%', color: '#9333ea', winText: 'Скидка 10% на любую услугу', weight: 10, promo: 'AFRO10' },
+        { id: 6, text: 'VIP 2 000 ₽', color: '#4c1d95', winText: 'VIP Сертификат 2 000 ₽', weight: 5, promo: 'AFROVIP' }
+      ]
+    },
+
+    // 2. Грей Зед Вульф (Маркетинг & Яндекс Директ)
+    greyzzzzwolf: {
+      title: 'Бонус на рекламу от Волка',
+      subtitle: 'Испытай удачу и забери разбор или скидку на запуск рекламной кампании',
+      floatingBtnText: '🐺 Крутить колесо Волка',
+      themeColor: '#e11d48',
+      secondaryColor: '#f59e0b',
+      goldColor: '#fbbf24',
+      bgColor: '#0b0910',
+      telegramBot: 'greyzzzzwolf_bot',
+      metrikaCounterId: null,
+      metrikaGoal: 'fortune_wheel_lead',
+      sectors: [
+        { id: 1, text: 'Разбор РК', color: '#e11d48', winText: 'Бесплатный видеообзор и анализ вашей РК', weight: 35, promo: 'WOLFAUDIT' },
+        { id: 2, text: 'Скидка 5 000 ₽', color: '#181224', winText: 'Скидка 5 000 ₽ на настройку Яндекс Директ', weight: 25, promo: 'WOLF5000' },
+        { id: 3, text: 'Скидка 15%', color: '#f59e0b', winText: 'Скидка 15% на ведение рекламы', weight: 15, promo: 'WOLF15' },
+        { id: 4, text: 'Чек-лист трафика', color: '#181224', winText: 'Закрытый чек-лист масштабирования связок', weight: 15, promo: 'WOLFCHECK' },
+        { id: 5, text: 'Инвайтинг TG', color: '#7c3aed', winText: 'Тестовый инвайтинг в Telegram / MAX', weight: 10, promo: 'WOLFINVITE' }
+      ]
+    },
+
+    // 3. SSP Agency (Обучение)
+    ssp_agency: {
+      title: 'Грант на обучение рекламе',
+      subtitle: 'Выбей максимальную скидку на практикум по Яндекс Директ',
+      floatingBtnText: '🎓 Забрать скидку на курс',
+      themeColor: '#2563eb',
+      secondaryColor: '#38bdf8',
+      goldColor: '#fbbf24',
+      bgColor: '#090e1a',
+      telegramBot: 'ssp_agency_bot',
+      metrikaCounterId: null,
+      metrikaGoal: 'ssp_wheel_lead',
+      sectors: [
+        { id: 1, text: 'Скидка 20%', color: '#2563eb', winText: 'Скидка 20% на курс', weight: 30, promo: 'SSP20' },
+        { id: 2, text: 'Урок в подарок', color: '#131d33', winText: 'Доступ к закрытому модулю по Директу', weight: 25, promo: 'SSPFREE' },
+        { id: 3, text: 'Скидка 30%', color: '#0284c7', winText: 'Скидка 30% на тариф Наставничество', weight: 15, promo: 'SSP30' },
+        { id: 4, text: 'Разбор кампании', color: '#131d33', winText: 'Персональный разбор вашей кампании', weight: 20, promo: 'SSPAUDIT' },
+        { id: 5, text: 'Грант 5 000 ₽', color: '#4f46e5', winText: 'Грант 5 000 ₽ на обучение', weight: 10, promo: 'SSP5000' }
+      ]
+    }
+  };
+
+  // Дефолтные настройки
   const DEFAULT_CONFIG = {
-    title: 'Испытай удачу!',
-    subtitle: 'Крути колесо и забирай гарантированный подарок от студии',
+    project: 'afrostudio',
     buttonText: 'Крутить колесо',
-    floatingBtnText: 'Подарок за спин',
-    themeColor: '#ff4d6d',
-    secondaryColor: '#f72585',
-    goldColor: '#fbbf24',
-    bgColor: '#0f0c1b',
-    sectors: [
-      { id: 1, text: 'Скидка 15%', color: '#ff4d6d', winText: 'Скидка 15% на любые услуги', weight: 30, promo: 'SPIN15' },
-      { id: 2, text: 'Подарок 1 000 ₽', color: '#1f1b2e', winText: 'Сертификат 1 000 ₽ на услуги', weight: 25, promo: 'GIFT1000' },
-      { id: 3, text: 'Скидка 20%', color: '#f72585', winText: 'Скидка 20% на услуги', weight: 15, promo: 'SUPER20' },
-      { id: 4, text: 'Бесплатный разбор', color: '#1f1b2e', winText: 'Бесплатная персональная консультация', weight: 15, promo: 'FREEAUDIT' },
-      { id: 5, text: 'Скидка 10%', color: '#7209b7', winText: 'Скидка 10% на чек', weight: 10, promo: 'SALE10' },
-      { id: 6, text: 'VIP Бонус 2 000 ₽', color: '#3a0ca3', winText: 'VIP Сертификат 2 000 ₽', weight: 5, promo: 'VIP2000' }
-    ],
-    telegramBot: 'ssp_agency_bot', // имя телеграм бота без @
-    maxMessengerLink: '', // ссылка на MAX если используется
-    metrikaCounterId: null, // ID Яндекс.Метрики
-    metrikaGoal: 'fortune_wheel_lead', // цель в метрике
-    webhookUrl: '', // url для отправки лида
-    allowMultipleSpins: false // повторный спин
+    allowMultipleSpins: false,
+    webhookUrl: ''
   };
 
   class FortuneWheelWidget {
-    constructor(customConfig = {}) {
-      this.config = Object.assign({}, DEFAULT_CONFIG, customConfig);
+    constructor(userConfig = {}) {
+      const presetKey = userConfig.project || 'afrostudio';
+      const preset = PROJECT_PRESETS[presetKey] || PROJECT_PRESETS.afrostudio;
+      this.config = Object.assign({}, DEFAULT_CONFIG, preset, userConfig);
       this.isSpinning = false;
       this.hasSpun = false;
       this.currentRotation = 0;
@@ -43,10 +96,10 @@
     }
 
     init() {
-      // Проверка localStorage на уже сыгранный спин
+      const storageKey = 'fw_won_' + (this.config.project || 'default');
       if (!this.config.allowMultipleSpins) {
         try {
-          const savedWon = localStorage.getItem('fw_won_sector');
+          const savedWon = localStorage.getItem(storageKey);
           if (savedWon) {
             this.hasSpun = true;
             this.wonSector = JSON.parse(savedWon);
@@ -62,7 +115,6 @@
       this.attachEvents();
     }
 
-    // Аудиокликер на Web Audio API (без внешних mp3)
     playTick() {
       try {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -72,23 +124,22 @@
         const osc = this.audioCtx.createOscillator();
         const gain = this.audioCtx.createGain();
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(600, this.audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(150, this.audioCtx.currentTime + 0.04);
+        osc.frequency.setValueAtTime(620, this.audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(140, this.audioCtx.currentTime + 0.035);
         gain.gain.setValueAtTime(0.12, this.audioCtx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.01, this.audioCtx.currentTime + 0.04);
+        gain.gain.linearRampToValueAtTime(0.01, this.audioCtx.currentTime + 0.035);
         osc.connect(gain);
         gain.connect(this.audioCtx.destination);
         osc.start();
-        osc.stop(this.audioCtx.currentTime + 0.045);
+        osc.stop(this.audioCtx.currentTime + 0.04);
       } catch (e) {}
     }
 
     injectStyles() {
       if (document.getElementById('fw-styles')) return;
-      const style = document.createElement('style');
-      style.id = 'fw-styles';
-      style.innerHTML = `
-        /* --- FW WIDGET STYLES --- */
+      const s = document.createElement('style');
+      s.id = 'fw-styles';
+      s.innerHTML = `
         .fw-floating-btn {
           position: fixed;
           bottom: 24px;
@@ -97,41 +148,33 @@
           display: flex;
           align-items: center;
           gap: 10px;
-          padding: 12px 22px 12px 16px;
-          background: linear-gradient(135deg, #ff4d6d, #f72585 50%, #fbbf24);
+          padding: 13px 24px 13px 18px;
+          background: linear-gradient(135deg, ${this.config.themeColor}, ${this.config.secondaryColor} 60%, ${this.config.goldColor});
           color: #ffffff;
           border: 1px solid rgba(255, 255, 255, 0.4);
           border-radius: 9999px;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
           font-size: 14px;
-          font-weight: 700;
+          font-weight: 800;
           cursor: pointer;
-          box-shadow: 0 10px 30px rgba(247, 37, 133, 0.45), 0 0 15px rgba(251, 191, 36, 0.35);
+          box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(251, 191, 36, 0.35);
           animation: fw-pulse 2.2s infinite ease-in-out;
           transition: transform 0.25s ease, box-shadow 0.25s ease;
           user-select: none;
         }
         .fw-floating-btn:hover {
           transform: translateY(-3px) scale(1.04);
-          box-shadow: 0 14px 40px rgba(247, 37, 133, 0.65);
+          box-shadow: 0 14px 40px rgba(0,0,0,0.7), 0 0 25px rgba(251, 191, 36, 0.5);
         }
-        .fw-floating-btn svg {
-          width: 26px;
-          height: 26px;
-          filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-        }
-        @keyframes fw-pulse {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.06); }
-        }
+        .fw-floating-btn svg { width: 24px; height: 24px; }
+        @keyframes fw-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 
-        /* Modal Overlay */
         .fw-modal-backdrop {
           position: fixed;
           inset: 0;
-          background: rgba(10, 8, 18, 0.85);
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
+          background: rgba(8, 6, 14, 0.88);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
           z-index: 99999;
           display: flex;
           align-items: center;
@@ -141,21 +184,18 @@
           transition: opacity 0.3s ease, visibility 0.3s ease;
           padding: 16px;
           box-sizing: border-box;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
-        .fw-modal-backdrop.fw-open {
-          opacity: 1;
-          visibility: visible;
-        }
+        .fw-modal-backdrop.fw-open { opacity: 1; visibility: visible; }
         .fw-modal-card {
           position: relative;
           width: 100%;
           max-width: 860px;
           background: linear-gradient(160deg, #181329 0%, #0e0a1a 100%);
-          border: 1px solid rgba(247, 37, 133, 0.35);
+          border: 1px solid rgba(255, 255, 255, 0.15);
           border-radius: 28px;
-          box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8), 0 0 40px rgba(247, 37, 133, 0.2);
-          padding: 36px 32px;
+          box-shadow: 0 30px 80px rgba(0, 0, 0, 0.85);
+          padding: 38px 34px;
           box-sizing: border-box;
           color: #ffffff;
           overflow: hidden;
@@ -175,59 +215,21 @@
           justify-content: center;
           font-size: 20px;
           cursor: pointer;
-          transition: background 0.2s, transform 0.2s;
+          transition: transform 0.2s;
           z-index: 10;
         }
-        .fw-close-btn:hover {
-          background: rgba(247, 37, 133, 0.3);
-          transform: rotate(90deg);
-        }
+        .fw-close-btn:hover { transform: rotate(90deg); background: rgba(255, 255, 255, 0.2); }
 
-        /* Layout Grid */
-        .fw-layout {
-          display: grid;
-          grid-template-columns: 1.15fr 0.95fr;
-          gap: 32px;
-          align-items: center;
-        }
+        .fw-layout { display: grid; grid-template-columns: 1.15fr 0.95fr; gap: 32px; align-items: center; }
         @media (max-width: 768px) {
-          .fw-layout {
-            grid-template-columns: 1fr;
-            gap: 20px;
-          }
-          .fw-modal-card {
-            padding: 26px 18px;
-            max-height: 94vh;
-            overflow-y: auto;
-          }
+          .fw-layout { grid-template-columns: 1fr; gap: 20px; }
+          .fw-modal-card { padding: 26px 18px; max-height: 94vh; overflow-y: auto; }
         }
 
-        /* Wheel Area */
-        .fw-wheel-container {
-          position: relative;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          margin: 0 auto;
-        }
-        .fw-wheel-wrapper {
-          position: relative;
-          width: 360px;
-          height: 360px;
-          max-width: 100%;
-        }
-        @media (max-width: 480px) {
-          .fw-wheel-wrapper {
-            width: 290px;
-            height: 290px;
-          }
-        }
-        .fw-wheel-canvas {
-          width: 100%;
-          height: 100%;
-          border-radius: 50%;
-          box-shadow: 0 0 35px rgba(247, 37, 133, 0.4), inset 0 0 20px rgba(0,0,0,0.6);
-        }
+        .fw-wheel-container { position: relative; display: flex; justify-content: center; align-items: center; margin: 0 auto; }
+        .fw-wheel-wrapper { position: relative; width: 360px; height: 360px; max-width: 100%; }
+        @media (max-width: 480px) { .fw-wheel-wrapper { width: 290px; height: 290px; } }
+        .fw-wheel-canvas { width: 100%; height: 100%; border-radius: 50%; box-shadow: 0 0 35px rgba(0,0,0,0.6); }
         .fw-pointer {
           position: absolute;
           top: -12px;
@@ -237,7 +239,6 @@
           width: 34px;
           height: 42px;
           filter: drop-shadow(0 4px 10px rgba(0,0,0,0.7));
-          transition: transform 0.1s cubic-bezier(0.18, 0.89, 0.32, 1.28);
         }
         .fw-wheel-center {
           position: absolute;
@@ -258,11 +259,9 @@
           font-size: 11px;
           color: #110d1f;
           text-transform: uppercase;
-          letter-spacing: 0.05em;
           cursor: pointer;
         }
 
-        /* Right Content Area */
         .fw-info-pane h3 {
           font-size: 26px;
           font-weight: 800;
@@ -272,48 +271,28 @@
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
         }
-        .fw-info-pane p {
-          font-size: 14px;
-          line-height: 1.5;
-          color: #cbd5e1;
-          margin: 0 0 24px;
-        }
+        .fw-info-pane p { font-size: 14px; line-height: 1.5; color: #cbd5e1; margin: 0 0 24px; }
         .fw-spin-btn {
           width: 100%;
           padding: 16px 24px;
           border-radius: 9999px;
-          background: linear-gradient(135deg, #ff4d6d 0%, #f72585 50%, #fbbf24 100%);
+          background: linear-gradient(135deg, ${this.config.themeColor} 0%, ${this.config.secondaryColor} 50%, ${this.config.goldColor} 100%);
           color: #ffffff;
           font-size: 16px;
           font-weight: 800;
           text-transform: uppercase;
           letter-spacing: 0.06em;
           border: 1px solid rgba(255, 255, 255, 0.4);
-          box-shadow: 0 8px 25px rgba(247, 37, 133, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.6);
+          box-shadow: 0 8px 25px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255, 255, 255, 0.6);
           cursor: pointer;
           transition: transform 0.25s, box-shadow 0.25s;
         }
-        .fw-spin-btn:hover:not(:disabled) {
-          transform: translateY(-2px);
-          box-shadow: 0 12px 35px rgba(247, 37, 133, 0.7);
-        }
-        .fw-spin-btn:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
+        .fw-spin-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(0,0,0,0.6); }
+        .fw-spin-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        /* Win Result & Lead Form */
-        .fw-result-box {
-          display: none;
-          animation: fw-fade-up 0.4s ease;
-        }
-        .fw-result-box.fw-active {
-          display: block;
-        }
-        @keyframes fw-fade-up {
-          from { opacity: 0; transform: translateY(12px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
+        .fw-result-box { display: none; animation: fw-fade-up 0.4s ease; }
+        .fw-result-box.fw-active { display: block; }
+        @keyframes fw-fade-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
         .fw-prize-badge {
           background: rgba(251, 191, 36, 0.15);
           border: 1px solid #fbbf24;
@@ -322,49 +301,24 @@
           margin-bottom: 20px;
           text-align: center;
         }
-        .fw-prize-badge .fw-won-label {
-          font-size: 12px;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          color: #fbbf24;
-          font-weight: 700;
-        }
-        .fw-prize-badge .fw-won-title {
-          font-size: 20px;
-          font-weight: 800;
-          color: #ffffff;
-          margin-top: 4px;
-        }
+        .fw-won-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: #fbbf24; font-weight: 700; }
+        .fw-won-title { font-size: 20px; font-weight: 800; color: #ffffff; margin-top: 4px; }
         .fw-input-field {
           width: 100%;
           padding: 14px 18px;
           border-radius: 12px;
           background: rgba(255, 255, 255, 0.06);
-          border: 1.5px solid rgba(247, 37, 133, 0.35);
+          border: 1.5px solid rgba(255, 255, 255, 0.2);
           color: #ffffff;
           font-size: 15px;
           box-sizing: border-box;
           margin-bottom: 12px;
           outline: none;
-          transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .fw-input-field:focus {
-          border-color: #fbbf24;
-          box-shadow: 0 0 15px rgba(251, 191, 36, 0.3);
-        }
-        .fw-input-field::placeholder {
-          color: #94a3b8;
-        }
+        .fw-input-field:focus { border-color: #fbbf24; box-shadow: 0 0 15px rgba(251, 191, 36, 0.3); }
 
-        /* Success screen with bot link */
-        .fw-success-pane {
-          display: none;
-          text-align: center;
-          padding: 10px 0;
-        }
-        .fw-success-pane.fw-active {
-          display: block;
-        }
+        .fw-success-pane { display: none; text-align: center; padding: 10px 0; }
+        .fw-success-pane.fw-active { display: block; }
         .fw-promo-tag {
           display: inline-block;
           padding: 8px 18px;
@@ -374,7 +328,6 @@
           color: #fbbf24;
           font-size: 18px;
           font-weight: 800;
-          letter-spacing: 0.1em;
           margin: 12px 0 16px;
         }
         .fw-bot-btn {
@@ -395,16 +348,10 @@
           transition: transform 0.2s;
           box-sizing: border-box;
         }
-        .fw-bot-btn:hover {
-          transform: translateY(-2px);
-        }
-        .fw-bot-btn svg {
-          width: 20px;
-          height: 20px;
-          fill: currentColor;
-        }
+        .fw-bot-btn:hover { transform: translateY(-2px); }
+        .fw-bot-btn svg { width: 20px; height: 20px; fill: currentColor; }
       `;
-      document.head.appendChild(style);
+      document.head.appendChild(s);
     }
 
     createFloatingTrigger() {
@@ -413,13 +360,7 @@
       btn.id = 'fw-trigger-btn';
       btn.className = 'fw-floating-btn';
       btn.innerHTML = `
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="20 12 20 22 4 22 4 12"></polyline>
-          <rect x="2" y="7" width="20" height="5"></rect>
-          <line x1="12" y1="22" x2="12" y2="7"></line>
-          <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
-          <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
-        </svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
         <span>${this.config.floatingBtnText}</span>
       `;
       btn.addEventListener('click', () => this.openModal());
@@ -435,8 +376,6 @@
         <div class="fw-modal-card">
           <div class="fw-close-btn" id="fw-close">&times;</div>
           <div class="fw-layout">
-            
-            <!-- Left: Wheel -->
             <div class="fw-wheel-container">
               <div class="fw-wheel-wrapper">
                 <svg class="fw-pointer" viewBox="0 0 34 42" fill="none">
@@ -447,45 +386,33 @@
                 <div class="fw-wheel-center" id="fw-center-spin">СПИН</div>
               </div>
             </div>
-
-            <!-- Right: Interactive Panel -->
             <div class="fw-info-pane">
-              
-              <!-- State 1: Before Spin -->
               <div id="fw-initial-box">
                 <h3>${this.config.title}</h3>
                 <p>${this.config.subtitle}</p>
                 <button class="fw-spin-btn" id="fw-main-spin-btn">${this.config.buttonText}</button>
               </div>
-
-              <!-- State 2: Win Result + Lead Form -->
               <div id="fw-result-box" class="fw-result-box">
                 <div class="fw-prize-badge">
                   <div class="fw-won-label">🎉 Ваш выигрыш:</div>
-                  <div class="fw-won-title" id="fw-won-title">Скидка 15%</div>
+                  <div class="fw-won-title" id="fw-won-title"></div>
                 </div>
-                <p style="margin-bottom: 14px;">Введите телефон, чтобы зафиксировать подарок за вашим номером:</p>
+                <p style="margin-bottom: 14px;">Введите телефон, чтобы закрепить подарок за вашим номером:</p>
                 <input type="text" class="fw-input-field" id="fw-name" placeholder="Ваше имя">
                 <input type="tel" class="fw-input-field" id="fw-phone" placeholder="+7 (___) ___-__-__">
                 <button class="fw-spin-btn" id="fw-claim-btn" style="margin-top: 4px;">Забрать подарок</button>
               </div>
-
-              <!-- State 3: Success Screen with Telegram / MAX Bot -->
               <div id="fw-success-box" class="fw-success-pane">
                 <h3 style="font-size: 24px;">Подарок забронирован!</h3>
                 <p style="margin-bottom: 8px;">Ваш персональный промокод:</p>
-                <div class="fw-promo-tag" id="fw-promo-code">SPIN15</div>
-                <p style="font-size: 13px; color: #94a3b8; margin-bottom: 12px;">
-                  Активируйте промокод через нашего Telegram-бота прямо сейчас:
-                </p>
+                <div class="fw-promo-tag" id="fw-promo-code"></div>
+                <p style="font-size: 13px; color: #94a3b8; margin-bottom: 12px;">Активируйте промокод в боте прямо сейчас:</p>
                 <a href="#" target="_blank" class="fw-bot-btn" id="fw-bot-link">
                   <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.37.74-.56 2.92-1.27 4.86-2.11 5.83-2.52 2.77-1.16 3.35-1.36 3.73-1.37.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.23 0 .37z"/></svg>
                   <span>Забрать в Telegram</span>
                 </a>
               </div>
-
             </div>
-
           </div>
         </div>
       `;
@@ -496,7 +423,7 @@
       this.canvas = document.getElementById('fw-canvas');
       if (!this.canvas) return;
       this.ctx = this.canvas.getContext('2d');
-      const size = 720; // High-res retina
+      const size = 720;
       this.canvas.width = size;
       this.canvas.height = size;
       this.center = size / 2;
@@ -512,7 +439,6 @@
 
       ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-      // Draw Outer Rim with metallic studs
       ctx.save();
       ctx.translate(this.center, this.center);
       ctx.rotate(angleRad);
@@ -523,14 +449,12 @@
       ctx.strokeStyle = '#fbbf24';
       ctx.stroke();
 
-      // Outer gold glowing border
       ctx.beginPath();
       ctx.arc(0, 0, this.radius - 8, 0, 2 * Math.PI);
       ctx.lineWidth = 4;
       ctx.strokeStyle = '#ffffff';
       ctx.stroke();
 
-      // Draw Sectors
       for (let i = 0; i < numSectors; i++) {
         const sectorAngle = i * arc;
         const sector = sectors[i];
@@ -542,12 +466,10 @@
         ctx.fillStyle = sector.color;
         ctx.fill();
 
-        // Sector divider line
         ctx.lineWidth = 2.5;
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
         ctx.stroke();
 
-        // Sector Text
         ctx.save();
         ctx.rotate(sectorAngle + arc / 2);
         ctx.textAlign = 'right';
@@ -559,7 +481,6 @@
         ctx.fillText(sector.text, this.radius - 40, 0);
         ctx.restore();
 
-        // Light studs on border
         const dotAngle = sectorAngle;
         const dotX = Math.cos(dotAngle) * (this.radius - 1);
         const dotY = Math.sin(dotAngle) * (this.radius - 1);
@@ -577,9 +498,7 @@
       const totalWeight = sectors.reduce((sum, s) => sum + (s.weight || 10), 0);
       let rand = Math.random() * totalWeight;
       for (let s of sectors) {
-        if (rand < (s.weight || 10)) {
-          return s;
-        }
+        if (rand < (s.weight || 10)) return s;
         rand -= (s.weight || 10);
       }
       return sectors[0];
@@ -602,14 +521,10 @@
       const winningSector = this.pickWinningSector();
       this.wonSector = winningSector;
 
-      // Pointer is located at TOP (-Math.PI / 2).
-      // Calculate target angle
       const winningIndex = sectors.findIndex(s => s.id === winningSector.id);
       const sectorCenterAngle = (winningIndex * arc) + (arc / 2);
-      
-      // We need: (targetAngle + sectorCenterAngle) % 2PI = 3PI/2 (top)
       const topOffset = (3 * Math.PI / 2) - sectorCenterAngle;
-      const fullRotations = (5 + Math.floor(Math.random() * 3)) * 2 * Math.PI; // 5-7 spins
+      const fullRotations = (5 + Math.floor(Math.random() * 3)) * 2 * Math.PI;
       const totalTargetRotation = this.currentRotation + fullRotations + (topOffset - (this.currentRotation % (2 * Math.PI)) + 2 * Math.PI);
 
       const durationMs = 5200;
@@ -627,7 +542,6 @@
         this.currentRotation = startRotation + (totalTargetRotation - startRotation) * eased;
         this.drawWheel(this.currentRotation);
 
-        // Sound effect tick when crossing sectors
         if (Math.abs(this.currentRotation - lastTickAngle) >= arc) {
           this.playTick();
           lastTickAngle = this.currentRotation;
@@ -639,7 +553,8 @@
           this.isSpinning = false;
           this.hasSpun = true;
           try {
-            localStorage.setItem('fw_won_sector', JSON.stringify(this.wonSector));
+            const storageKey = 'fw_won_' + (this.config.project || 'default');
+            localStorage.setItem(storageKey, JSON.stringify(this.wonSector));
           } catch (e) {}
           this.showResult(this.wonSector);
         }
@@ -660,12 +575,13 @@
       const phone = document.getElementById('fw-phone').value.trim();
 
       if (!phone || phone.length < 10) {
-        alert('Пожалуйста, укажите корректный номер телефона для бронирования приза.');
+        alert('Пожалуйста, укажите телефон для закрепления подарка.');
         document.getElementById('fw-phone').focus();
         return;
       }
 
       const leadData = {
+        project: this.config.project,
         name: name || 'Гость',
         phone: phone,
         prize: this.wonSector.winText || this.wonSector.text,
@@ -673,14 +589,13 @@
         date: new Date().toISOString()
       };
 
-      // 1. Отправка цели в Яндекс.Метрику если подключена
+      // Фиксация в Яндекс.Метрике
       if (typeof window.ym === 'function' && this.config.metrikaCounterId) {
         try {
           window.ym(this.config.metrikaCounterId, 'reachGoal', this.config.metrikaGoal, leadData);
         } catch (e) {}
       }
 
-      // 2. Webhook если настроен
       if (this.config.webhookUrl) {
         try {
           fetch(this.config.webhookUrl, {
@@ -691,46 +606,33 @@
         } catch (e) {}
       }
 
-      // 3. Сохранение локально
       try {
-        localStorage.setItem('fw_lead_sent', JSON.stringify(leadData));
+        localStorage.setItem('fw_lead_' + this.config.project, JSON.stringify(leadData));
       } catch (e) {}
 
-      // Переход на экран поздравления и бота
       document.getElementById('fw-result-box').classList.remove('fw-active');
       const successBox = document.getElementById('fw-success-box');
       successBox.classList.add('fw-active');
       document.getElementById('fw-promo-code').innerText = leadData.promo;
 
-      // Ссылка на Telegram бота со start параметром
       const botUrl = `https://t.me/${this.config.telegramBot}?start=prize_${leadData.promo}_${encodeURIComponent(leadData.phone.replace(/\\D/g, ''))}`;
-      const botBtn = document.getElementById('fw-bot-link');
-      botBtn.href = botUrl;
+      document.getElementById('fw-bot-link').href = botUrl;
     }
 
     attachEvents() {
-      // Кнопки открытия/закрытия
       document.getElementById('fw-close').addEventListener('click', () => this.closeModal());
       document.getElementById('fw-modal').addEventListener('click', (e) => {
         if (e.target.id === 'fw-modal') this.closeModal();
       });
-
-      // Запуск вращения
       document.getElementById('fw-main-spin-btn').addEventListener('click', () => this.spin());
       document.getElementById('fw-center-spin').addEventListener('click', () => this.spin());
-
-      // Получение приза
       document.getElementById('fw-claim-btn').addEventListener('click', () => this.claimPrize());
 
-      // Маска телефона РФ
       const phoneInput = document.getElementById('fw-phone');
       if (phoneInput) {
         phoneInput.addEventListener('input', (e) => {
           let val = e.target.value.replace(/\\D/g, '');
-          if (!val) {
-            e.target.value = '';
-            return;
-          }
+          if (!val) { e.target.value = ''; return; }
           if (val[0] === '7' || val[0] === '8') val = val.substring(1);
           let formatted = '+7 (';
           if (val.length > 0) formatted += val.substring(0, 3);
@@ -743,24 +645,21 @@
     }
 
     openModal() {
-      const modal = document.getElementById('fw-modal');
-      if (modal) modal.classList.add('fw-open');
+      const m = document.getElementById('fw-modal');
+      if (m) m.classList.add('fw-open');
     }
 
     closeModal() {
-      const modal = document.getElementById('fw-modal');
-      if (modal) modal.classList.remove('fw-open');
+      const m = document.getElementById('fw-modal');
+      if (m) m.classList.remove('fw-open');
     }
   }
 
-  // Экспорт в глобальную область
   window.FortuneWheelWidget = FortuneWheelWidget;
 
-  // Авто-инициализация если передан конфиг через window.FORTUNE_WHEEL_CONFIG
   if (window.FORTUNE_WHEEL_AUTO_INIT !== false) {
     document.addEventListener('DOMContentLoaded', () => {
       window.fwInstance = new FortuneWheelWidget(window.FORTUNE_WHEEL_CONFIG || {});
     });
   }
-
 })(window, document);
