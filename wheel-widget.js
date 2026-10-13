@@ -1,43 +1,49 @@
 /**
- * FORTUNE WHEEL WIDGET (Колесо Фортуны) v3.5 — Page Targeting Engine
- * Supports targetPages whitelist (up to N specific pages or all pages)
- * GitHub: https://github.com/snesterov/fortune-wheel
+ * FORTUNE WHEEL WIDGET (Колесо Фортуны) v4.0 — Bulletproof Tilda & Standalone Engine
+ * Auto-detects project from script URL: <script src=".../wheel-widget.js?p=PROJECT_ID"></script>
+ * Auto-renders inline or opens modal instantly if placed on a standalone/blank page
+ * Supports: Tilda T123, Site Settings, Embed containers, Page targeting, Metrika & Telegram bots
  * CDN: https://snesterov.github.io/fortune-wheel/wheel-widget.js
  */
 (function(window, document) {
   'use strict';
 
+  // Вшитая база проектов
   const EMBEDDED_PROJECTS = {
     wolfhunt: {
       name: 'WolfHunt (Грей Зед Вульф)',
       title: 'Бонус от WolfHunt!',
-      subtitle: 'Крути колесо и забирай разбор или скидку на запуск',
+      subtitle: 'Крути колесо и забирай разбор или скидку на запуск рекламы',
       floatingBtnText: '🐺 Крутить колесо Волка',
       delay: 0,
       bot: 'greyzzzzwolf_bot',
       metrikaCounterId: 88058414,
       metrikaGoal: 'fortune_wheel_lead',
       themeColor: '#e11d48',
-      targetPages: [], // все страницы
+      secondaryColor: '#f59e0b',
+      goldColor: '#fbbf24',
+      targetPages: [],
       sectors: [
         { id: 1, text: 'Разбор РК', color: '#e11d48', winText: 'Бесплатный видеообзор и анализ вашей РК', weight: 35, promo: 'WOLFAUDIT' },
         { id: 2, text: 'Скидка 5 000 ₽', color: '#181224', winText: 'Скидка 5 000 ₽ на настройку Яндекс Директ', weight: 25, promo: 'WOLF5000' },
         { id: 3, text: 'Скидка 15%', color: '#f59e0b', winText: 'Скидка 15% на ведение рекламы', weight: 15, promo: 'WOLF15' },
-        { id: 4, text: 'Чек-лист', color: '#181224', winText: 'Закрытый чек-лист связок', weight: 15, promo: 'WOLFCHECK' },
+        { id: 4, text: 'Чек-лист связок', color: '#181224', winText: 'Закрытый чек-лист связок для рекламы', weight: 15, promo: 'WOLFCHECK' },
         { id: 5, text: 'Инвайтинг TG', color: '#7c3aed', winText: 'Тестовый инвайтинг в Telegram / MAX', weight: 10, promo: 'WOLFINVITE' }
       ]
     },
     afrostudio: {
       name: 'Афростудия (Бьюти салон)',
       title: 'Секретный бонус студии!',
-      subtitle: 'Крути колесо и забирай подарок на плетение кос',
+      subtitle: 'Крути колесо и забирай подарок на плетение кос или уход',
       floatingBtnText: '🎁 Бонус на плетение',
-      delay: 7,
+      delay: 0,
       bot: 'afrostudio_bot',
       metrikaCounterId: 88058414,
       metrikaGoal: 'gamelead_send',
       themeColor: '#f43f5e',
-      targetPages: ['/', '/price'],
+      secondaryColor: '#fb7185',
+      goldColor: '#fbbf24',
+      targetPages: [],
       sectors: [
         { id: 1, text: 'Скидка 15%', color: '#f43f5e', winText: 'Скидка 15% на первое плетение', weight: 30, promo: 'AFRO15' },
         { id: 2, text: 'Подарок 1 000 ₽', color: '#1c152a', winText: 'Сертификат 1 000 ₽ на комплект кос', weight: 25, promo: 'AFRO1000' },
@@ -52,11 +58,13 @@
       title: 'Грант на обучение рекламе',
       subtitle: 'Выбей максимальную скидку на практикум по Яндекс Директ',
       floatingBtnText: '🎓 Забрать скидку на курс',
-      delay: 10,
+      delay: 0,
       bot: 'ssp_agency_bot',
       metrikaCounterId: 88058414,
       metrikaGoal: 'ssp_wheel_lead',
       themeColor: '#2563eb',
+      secondaryColor: '#38bdf8',
+      goldColor: '#fbbf24',
       targetPages: [],
       sectors: [
         { id: 1, text: 'Скидка 20%', color: '#2563eb', winText: 'Скидка 20% на курс', weight: 30, promo: 'SSP20' },
@@ -84,7 +92,7 @@
     projectId: 'wolfhunt',
     buttonText: 'Крутить колесо',
     allowMultipleSpins: false,
-    targetPages: [] // пустой массив = все страницы
+    targetPages: []
   };
 
   class FortuneWheelWidget {
@@ -103,7 +111,6 @@
       this.projectId = projId;
       this.config = Object.assign({}, DEFAULT_CONFIG, basePreset, userConfig, { projectId: projId });
 
-      // Проверка таргетинга страниц
       if (!this.isPageAllowed()) {
         console.log(`[FortuneWheel] Виджет отключен для страницы: ${window.location.pathname}`);
         return;
@@ -116,10 +123,9 @@
       this.init();
     }
 
-    // Проверка разрешена ли текущая страница
     isPageAllowed() {
       const pages = this.config.targetPages;
-      if (!pages || !Array.isArray(pages) || pages.length === 0) return true; // если пусто — показ везде
+      if (!pages || !Array.isArray(pages) || pages.length === 0) return true;
       
       const currentPath = window.location.pathname.toLowerCase();
       const currentHref = window.location.href.toLowerCase();
@@ -128,14 +134,28 @@
         if (!page) return false;
         const p = page.trim().toLowerCase();
         if (p === '*' || p === 'all') return true;
-        // Главная страница
         if (p === '/' && (currentPath === '/' || currentPath === '' || currentPath === '/index.html')) return true;
-        // Совпадение пути
         if (currentPath === p || currentPath === p + '/') return true;
-        // Вхождение в URL
         if (currentHref.indexOf(p) !== -1 || currentPath.indexOf(p) !== -1) return true;
         return false;
       });
+    }
+
+    // Проверка, является ли страница пустой (например, только блок T123)
+    isStandalonePage() {
+      // Если на странице есть явный контейнер для колеса
+      if (document.getElementById('fortune-wheel')) return true;
+      // Если это Тильда, считаем количество значимых блоков
+      const tildaRecs = document.querySelectorAll('.t-records > .r');
+      if (tildaRecs.length > 0 && tildaRecs.length <= 2) {
+        // Проверяем, есть ли другие блоки кроме T123 (record-type 131)
+        let hasOtherContent = false;
+        tildaRecs.forEach(r => {
+          if (r.getAttribute('data-record-type') !== '131') hasOtherContent = true;
+        });
+        if (!hasOtherContent) return true;
+      }
+      return false;
     }
 
     init() {
@@ -151,16 +171,29 @@
       }
 
       this.injectStyles();
-      this.createFloatingTrigger();
-      this.createModal();
+
+      const standalone = this.isStandalonePage();
+
+      if (standalone) {
+        // Полноэкранный встроенный режим (если страница пустая или выделенная)
+        this.renderInlineWheel();
+      } else {
+        // Стандартный плавающий виджет
+        this.createFloatingTrigger();
+        this.createModal();
+      }
+
       this.setupCanvas();
       this.drawWheel(0);
       this.attachEvents();
 
-      if (this.config.delay && Number(this.config.delay) > 0 && !this.hasSpun) {
-        setTimeout(() => {
-          this.openModal();
-        }, Number(this.config.delay) * 1000);
+      console.log(`[FortuneWheel] Успешно инициализирован! Проект: ${this.projectId}, Режим: ${standalone ? 'Standalone Inline' : 'Modal Widget'}`);
+
+      // Если в режиме модалки, но задана задержка (или 0 на пустой странице)
+      if (!standalone) {
+        if (this.config.delay && Number(this.config.delay) > 0 && !this.hasSpun) {
+          setTimeout(() => { this.openModal(); }, Number(this.config.delay) * 1000);
+        }
       }
     }
 
@@ -189,6 +222,20 @@
       const s = document.createElement('style');
       s.id = 'fw-styles';
       s.innerHTML = `
+        /* Standalone Landing Page Style */
+        .fw-standalone-hero {
+          min-height: 100vh;
+          width: 100%;
+          background: radial-gradient(circle at center, #1b1330 0%, #090610 100%) !important;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 40px 20px;
+          box-sizing: border-box;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          color: #ffffff;
+        }
+
         .fw-floating-btn {
           position: fixed;
           bottom: 24px;
@@ -403,27 +450,10 @@
       document.head.appendChild(s);
     }
 
-    createFloatingTrigger() {
-      if (document.getElementById('fw-trigger-btn')) return;
-      const btn = document.createElement('div');
-      btn.id = 'fw-trigger-btn';
-      btn.className = 'fw-floating-btn';
-      btn.innerHTML = `
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
-        <span>${this.config.floatingBtnText || 'Подарок'}</span>
-      `;
-      btn.addEventListener('click', () => this.openModal());
-      document.body.appendChild(btn);
-    }
-
-    createModal() {
-      if (document.getElementById('fw-modal')) return;
-      const modal = document.createElement('div');
-      modal.id = 'fw-modal';
-      modal.className = 'fw-modal-backdrop';
-      modal.innerHTML = `
+    getWheelMarkup(isModal = true) {
+      return `
         <div class="fw-modal-card">
-          <div class="fw-close-btn" id="fw-close">&times;</div>
+          ${isModal ? '<div class="fw-close-btn" id="fw-close">&times;</div>' : ''}
           <div class="fw-layout">
             <div class="fw-wheel-container">
               <div class="fw-wheel-wrapper">
@@ -465,6 +495,45 @@
           </div>
         </div>
       `;
+    }
+
+    renderInlineWheel() {
+      // Ищем контейнер #fortune-wheel или вставляем прямо в body/allrecords
+      let target = document.getElementById('fortune-wheel');
+      if (!target) {
+        target = document.createElement('div');
+        target.id = 'fortune-wheel';
+        target.className = 'fw-standalone-hero';
+        // Если Tilda
+        const allrecords = document.getElementById('allrecords');
+        if (allrecords) {
+          allrecords.prepend(target);
+        } else {
+          document.body.prepend(target);
+        }
+      }
+      target.innerHTML = this.getWheelMarkup(false);
+    }
+
+    createFloatingTrigger() {
+      if (document.getElementById('fw-trigger-btn')) return;
+      const btn = document.createElement('div');
+      btn.id = 'fw-trigger-btn';
+      btn.className = 'fw-floating-btn';
+      btn.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
+        <span>${this.config.floatingBtnText || 'Подарок'}</span>
+      `;
+      btn.addEventListener('click', () => this.openModal());
+      document.body.appendChild(btn);
+    }
+
+    createModal() {
+      if (document.getElementById('fw-modal')) return;
+      const modal = document.createElement('div');
+      modal.id = 'fw-modal';
+      modal.className = 'fw-modal-backdrop';
+      modal.innerHTML = this.getWheelMarkup(true);
       document.body.appendChild(modal);
     }
 
@@ -562,7 +631,8 @@
       }
 
       this.isSpinning = true;
-      document.getElementById('fw-main-spin-btn').disabled = true;
+      const spinBtn = document.getElementById('fw-main-spin-btn');
+      if (spinBtn) spinBtn.disabled = true;
 
       const sectors = this.config.sectors || [];
       const numSectors = sectors.length;
@@ -614,19 +684,23 @@
     }
 
     showResult(sector) {
-      document.getElementById('fw-initial-box').style.display = 'none';
+      const initBox = document.getElementById('fw-initial-box');
+      if (initBox) initBox.style.display = 'none';
       const resultBox = document.getElementById('fw-result-box');
-      resultBox.classList.add('fw-active');
-      document.getElementById('fw-won-title').innerText = sector.winText || sector.text;
+      if (resultBox) resultBox.classList.add('fw-active');
+      const wonTitle = document.getElementById('fw-won-title');
+      if (wonTitle) wonTitle.innerText = sector.winText || sector.text;
     }
 
     claimPrize() {
-      const name = document.getElementById('fw-name').value.trim();
-      const phone = document.getElementById('fw-phone').value.trim();
+      const nameInput = document.getElementById('fw-name');
+      const phoneInput = document.getElementById('fw-phone');
+      const name = nameInput ? nameInput.value.trim() : '';
+      const phone = phoneInput ? phoneInput.value.trim() : '';
 
       if (!phone || phone.length < 10) {
         alert('Пожалуйста, укажите корректный телефон.');
-        document.getElementById('fw-phone').focus();
+        if (phoneInput) phoneInput.focus();
         return;
       }
 
@@ -659,24 +733,38 @@
         localStorage.setItem('fw_lead_' + this.projectId, JSON.stringify(leadData));
       } catch (e) {}
 
-      document.getElementById('fw-result-box').classList.remove('fw-active');
+      const resultBox = document.getElementById('fw-result-box');
+      if (resultBox) resultBox.classList.remove('fw-active');
       const successBox = document.getElementById('fw-success-box');
-      successBox.classList.add('fw-active');
-      document.getElementById('fw-promo-code').innerText = leadData.promo;
+      if (successBox) successBox.classList.add('fw-active');
+      const promoCode = document.getElementById('fw-promo-code');
+      if (promoCode) promoCode.innerText = leadData.promo;
 
       const bot = this.config.bot || this.config.telegramBot || 'greyzzzzwolf_bot';
       const botUrl = `https://t.me/${bot}?start=prize_${leadData.promo}_${encodeURIComponent(leadData.phone.replace(/\\D/g, ''))}`;
-      document.getElementById('fw-bot-link').href = botUrl;
+      const botLink = document.getElementById('fw-bot-link');
+      if (botLink) botLink.href = botUrl;
     }
 
     attachEvents() {
-      document.getElementById('fw-close').addEventListener('click', () => this.closeModal());
-      document.getElementById('fw-modal').addEventListener('click', (e) => {
-        if (e.target.id === 'fw-modal') this.closeModal();
-      });
-      document.getElementById('fw-main-spin-btn').addEventListener('click', () => this.spin());
-      document.getElementById('fw-center-spin').addEventListener('click', () => this.spin());
-      document.getElementById('fw-claim-btn').addEventListener('click', () => this.claimPrize());
+      const closeBtn = document.getElementById('fw-close');
+      if (closeBtn) closeBtn.addEventListener('click', () => this.closeModal());
+      
+      const modal = document.getElementById('fw-modal');
+      if (modal) {
+        modal.addEventListener('click', (e) => {
+          if (e.target.id === 'fw-modal') this.closeModal();
+        });
+      }
+
+      const mainSpin = document.getElementById('fw-main-spin-btn');
+      if (mainSpin) mainSpin.addEventListener('click', () => this.spin());
+
+      const centerSpin = document.getElementById('fw-center-spin');
+      if (centerSpin) centerSpin.addEventListener('click', () => this.spin());
+
+      const claimBtn = document.getElementById('fw-claim-btn');
+      if (claimBtn) claimBtn.addEventListener('click', () => this.claimPrize());
 
       const phoneInput = document.getElementById('fw-phone');
       if (phoneInput) {
@@ -707,9 +795,18 @@
 
   window.FortuneWheelWidget = FortuneWheelWidget;
 
+  // Безупречный запуск (независимо от того, когда загрузился скрипт)
+  function bootFortuneWheel() {
+    if (window._fwBooted) return;
+    window._fwBooted = true;
+    window.fwInstance = new FortuneWheelWidget(window.FORTUNE_WHEEL_CONFIG || {});
+  }
+
   if (window.FORTUNE_WHEEL_AUTO_INIT !== false) {
-    document.addEventListener('DOMContentLoaded', () => {
-      window.fwInstance = new FortuneWheelWidget(window.FORTUNE_WHEEL_CONFIG || {});
-    });
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootFortuneWheel);
+    } else {
+      bootFortuneWheel();
+    }
   }
 })(window, document);
