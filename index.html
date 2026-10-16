@@ -435,7 +435,22 @@
 
       <div class="control-group">
         <label>Telegram-бот (без @):</label>
-        <input type="text" id="cfg-bot" value="greyzzzzwolf_bot">
+        <input type="text" id="cfg-bot" value="greyzzzzwolf_bot" placeholder="client_bot">
+      </div>
+
+      <div class="control-group">
+        <label>Токен бота (BotFather):</label>
+        <input type="text" id="cfg-bot-token" value="8296699382:AAFDhuSBywHV0dEVduG5MSNmeqd7tbAj6oY" placeholder="123456:ABC-DEF...">
+      </div>
+
+      <div class="control-group">
+        <label>Chat ID клиента:</label>
+        <input type="text" id="cfg-chat-id" value="324874531" placeholder="324874531 или -100...">
+      </div>
+
+      <div class="control-group">
+        <label>Ссылка / Бот в MAX:</label>
+        <input type="text" id="cfg-max-link" value="" placeholder="https://max.im/client">
       </div>
 
       <div class="control-group">
@@ -489,7 +504,10 @@
         subtitle: 'Крути колесо и забирай разбор или скидку на запуск',
         floatBtn: '🐺 Крутить колесо Волка',
         delay: 0,
-        bot: 'greyzzzzwolf_bot',
+        bot_username: 'greyzzzzwolf_bot',
+        bot_token: '8296699382:AAFDhuSBywHV0dEVduG5MSNmeqd7tbAj6oY',
+        chat_id: '324874531',
+        max_link: 'https://max.im/greyzzzzwolf',
         metrika: 88058414,
         targetPages: [], // везде
         sectors: [
@@ -577,7 +595,10 @@
       document.getElementById('cfg-subtitle').value = p.subtitle || '';
       document.getElementById('cfg-float-btn').value = p.floatBtn || 'Подарок';
       document.getElementById('cfg-delay').value = p.delay !== undefined ? p.delay : 0;
-      document.getElementById('cfg-bot').value = p.bot || '';
+      document.getElementById('cfg-bot').value = p.bot_username || p.bot || '';
+      document.getElementById('cfg-bot-token').value = p.bot_token || '';
+      document.getElementById('cfg-chat-id').value = p.chat_id || '';
+      document.getElementById('cfg-max-link').value = p.max_link || '';
       document.getElementById('cfg-metrika').value = p.metrika || '';
 
       document.getElementById('active-project-tag').innerText = `Проект: ${p.name || pid}`;
@@ -699,7 +720,10 @@
         subtitle: document.getElementById('cfg-subtitle').value.trim(),
         floatBtn: document.getElementById('cfg-float-btn').value.trim(),
         delay: Number(document.getElementById('cfg-delay').value) || 0,
-        bot: document.getElementById('cfg-bot').value.trim(),
+        bot_username: document.getElementById('cfg-bot').value.trim(),
+        bot_token: document.getElementById('cfg-bot-token').value.trim(),
+        chat_id: document.getElementById('cfg-chat-id').value.trim(),
+        max_link: document.getElementById('cfg-max-link').value.trim(),
         metrika: Number(document.getElementById('cfg-metrika').value) || null,
         targetPages: currentTargetPages,
         sectors: currentSectors
